@@ -1,0 +1,81 @@
+{
+	"ETL": {
+		"api": {
+			"continents": {"process": "False"},
+			"countries": {"process": "False"},
+			"timezones": {"process": "False"},
+			"venues": {"process": "False", "params": {"country": ["Mexico"]}},
+			"leagues": {"process": "False"},
+			"teams": {"process": "False", "params": {"country": [], "league": [722], "season": [2020]}},
+			"matches": {"process": "False", "params": {"league": [722], "season": [2020]}},
+			"matches_events": {"process": "False", "params": {"league": [722], "season": [2020], "fixture_id": []}},
+			"predictions": {"process":  "False", "params": {"league": [722], "season": [2020], "fixture_id": []}},
+			"standings": {"process":  "False", "params": {"league": [722], "season": [2020]}}
+		},
+		"csv": {
+			"continents": {"process":  "False"},
+			"countries": {"process":  "False"},
+			"timezones": {"process":  "False"},
+			"league_rounds": {"process":  "False"},
+			"timezones_br_mx": {"process":  "True"}
+		}
+	},
+	"queries": {
+		"path": "C:/Repo/MiM_Analytics/Tesis/queries/",
+		"ABT": "tesis_ft_abt.sql",
+		"matches": "tesis_ft_matches.sql",
+		"leagues": "tesis_lk_leagues.sql",
+		"league_completeness": "tesis_lk_league_completeness.sql",
+		"match_stats": "tesis_lk_match_stats.sql",
+		"past_performance": "tesis_lk_past_performance.sql",
+		"player_ratings": "tesis_lk_player_ratings.sql",
+		"rounds_season": "tesis_lk_rounds_season.sql",
+		"standings_rounds": "tesis_lk_standings_rounds.sql",
+		"top_players": "tesis_lk_top_players.sql"
+	},
+	"data_sources": {
+		"api": {
+			"api-football": {
+				"host": "v3.football.api-sports.io",
+				"key": "4523f9463b64c58ce7c904213bc3aa68",
+				"endpoints": {
+					"timezone": "/timezone",
+					"countries": "/countries",
+					"leagues": "/leagues",
+					"seasons": "/leagues/seasons",
+					"teams": "/teams",
+					"venues": "/venues",
+					"standings": "/standings",
+					"fixture": "/fixtures",
+					"rounds": "/fixtures/rounds",
+					"match_stats": "/fixtures/statistics",
+					"match_events": "/fixtures/events",
+					"match_lineups": "/fixtures/lineups",
+					"match_player_stats": "/fixtures/players",
+					"predictions": "/predictions",
+					"transfers": "/predictions"
+				}
+			}
+		},
+		"csv": {
+			"path": "C:/GoogleDrive/MiM+Analytics/11 - Tesis/Football prediction/Data/",
+			"continents": "LKP_Continents.csv",
+			"countries": "LKP_Countries.csv",
+			"timezones": "LKP_Timezones.csv",
+			"league_rounds": "LKP_Leagues_Rounds.csv",
+			"timezones_br_mx": "LKP_Timezones_BR_MX_Venues.csv"
+		},
+		"postgreSQL": {
+			"host": "localhost",
+			"port": "5432",
+			"username": "postgres",
+			"password": "trivisono",
+			"database": "SportsAnalytics"
+		},
+		"mongoDB": {
+			"username": "username",
+			"password": "encrypted_password",
+			"host": "host name"
+		}
+	}
+}
