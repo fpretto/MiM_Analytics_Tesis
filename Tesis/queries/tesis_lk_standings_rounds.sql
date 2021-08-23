@@ -1,6 +1,6 @@
 -- Standings by Round
-DROP TABLE IF EXISTS fdm.tesis_lk_standings_rounds;
-CREATE TABLE fdm.tesis_lk_standings_rounds AS (
+DROP TABLE IF EXISTS fdm.tesis_lk_standings_rounds_0;
+CREATE TABLE fdm.tesis_lk_standings_rounds_0 AS (
 WITH 
 rounds AS(
 	SELECT DISTINCT fixtures.league_id, fixtures.league_season, fixtures.league_round, rounds.league_round_number,
@@ -71,5 +71,37 @@ SELECT
 	*,
 	DENSE_RANK() OVER (PARTITION BY league_id, league_season, league_round_number
 					 ORDER BY league_id, league_season, league_round_number, points_season DESC) AS rank
+	
 FROM tabla_posiciones
-ORDER BY league_id, league_season, league_round_number, points_season DESC, goals_diff_season DESC)
+ORDER BY league_id, league_season, league_round_number, points_season DESC, goals_diff_season DESC);
+
+DROP TABLE IF EXISTS fdm.tesis_lk_standings_rounds;
+CREATE TABLE fdm.tesis_lk_standings_rounds AS (
+SELECT
+	*,
+	COALESCE(LAG(rank, 1) OVER(PARTITION BY league_id, league_season, team_id 
+					  ORDER BY league_id, league_season, league_round_number), 0) AS rank_l1,
+	COALESCE(LAG(points_season, 1) OVER(PARTITION BY league_id, league_season, team_id 
+							   ORDER BY league_id, league_season, league_round_number), 0) AS points_season_l1,
+	COALESCE(LAG(goals_diff_season, 1) OVER(PARTITION BY league_id, league_season, team_id 
+								   ORDER BY league_id, league_season, league_round_number), 0) AS goals_diff_season_l1
+	
+FROM fdm.tesis_lk_standings_rounds_0);
+
+DROP TABLE IF EXISTS fdm.tesis_lk_standings_rounds_0;
+
+DROP TABLE IF EXISTS fdm.tesis_lk_standings_motivation;
+CREATE TABLE fdm.tesis_lk_standings_motivation AS (
+SELECT 
+	standings.league_id,
+	standings.league_season,
+	standings.league_round,
+	standings.league_round_number,
+	MAX(standings.rank_l1) AS rank_last,
+	MIN(standings.points_season_l1) AS rank_points_last,
+	MAX(standings.points_season_l1) AS rank_points_leader,
+	CAST(AVG(CASE WHEN standings.rank_l1=5 THEN standings.points_season_l1 ELSE NULL END) AS INT) AS rank_points_top5
+	
+FROM fdm.tesis_lk_standings_rounds AS standings
+GROUP BY league_id, league_season, league_round, league_round_number
+ORDER BY league_id, league_season, league_round_number);

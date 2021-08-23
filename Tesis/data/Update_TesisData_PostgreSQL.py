@@ -1,5 +1,5 @@
 
-from data.Load_PostgreSQL import PostgreSQL
+from Load_PostgreSQL import PostgreSQL
 import json
 import psycopg2
 
@@ -7,8 +7,8 @@ class TesisData:
     def __init__(self, etl_data):
         self.etl_data = etl_data
         self.pgEngine = PostgreSQL(self.etl_data)
-        self.execution_order = ['league_completeness', 'leagues', 'matches', 'match_stats', 'past_performance', 'player_ratings',
-                       'rounds_season', 'standings_rounds', 'top_players'] #'ABT'
+        self.execution_order = ['league_completeness', 'leagues', 'matches', 'match_stats', 'past_performance',
+                                'player_ratings', 'rounds_season', 'standings_rounds', 'top_players', 'ABT']
 
     def update_tesis_data(self):
         for sql_file in self.execution_order:

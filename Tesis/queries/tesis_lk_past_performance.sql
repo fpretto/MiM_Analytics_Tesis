@@ -106,9 +106,8 @@ SELECT
 	CASE WHEN matches_hist_ha_cnt=0 THEN -1 ELSE (COALESCE(match_points_ha_1, 0)+COALESCE(match_points_ha_2, 0)+COALESCE(match_points_ha_3, 0)+COALESCE(match_points_ha_4, 0)+COALESCE(match_points_ha_5, 0))/(CAST(matches_hist_ha_cnt AS float)*3) END AS ha_points_won_pct_l5
 	
 FROM form);
-	
---SELECT * FROM fdm.tesis_lk_past_performance
-order by league_id,league_season, team_id, league_round_number
+
+DROP TABLE IF EXISTS fdm.tesis_lk_past_performance_0;
 	
 	
 	
