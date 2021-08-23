@@ -21,7 +21,7 @@
 		}
 	},
 	"queries": {
-		"path": "C:/Repo/MiM_Analytics/Tesis/queries/",
+		"path": "C:/Repo/MiM_Analytics_Tesis/Tesis/queries/",
 		"ABT": "tesis_ft_abt.sql",
 		"matches": "tesis_ft_matches.sql",
 		"leagues": "tesis_lk_leagues.sql",

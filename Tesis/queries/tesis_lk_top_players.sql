@@ -1,7 +1,7 @@
 -- Top Scorers, Assisters and Goalkeepers
 -- Top Scorers
-DROP TABLE IF EXISTS fdm.tesis_lk_top_scorers;
-CREATE TABLE fdm.tesis_lk_top_scorers AS (
+DROP TABLE IF EXISTS fdm.tesis_lk_top_scorers_0;
+CREATE TABLE fdm.tesis_lk_top_scorers_0 AS (
 WITH 
 rounds AS ( 
 	SELECT DISTINCT fixtures.league_id, fixtures.league_season, fixtures.league_round, rounds.league_round_number
@@ -39,9 +39,25 @@ ON rounds.league_id=scorers_round.league_id AND rounds.league_season=scorers_rou
 	AND rounds.league_round=scorers_round.league_round AND scorers_season.player_id=scorers_round.player_id
 ORDER BY rounds.league_id, rounds.league_season, rounds.league_round_number, goals_season DESC);
 
+DROP TABLE IF EXISTS fdm.tesis_lk_top_scorers;
+CREATE TABLE fdm.tesis_lk_top_scorers AS (
+WITH lagged_goals AS(
+SELECT *,
+	LAG(goals_season, 1) OVER(PARTITION BY league_id, league_season, player_id ORDER BY league_id, league_season, league_round_number) AS goals_season_l1
+FROM fdm.tesis_lk_top_scorers_0)
+SELECT 
+	*,
+	CASE WHEN goals_season_l1=0 OR goals_season_l1 IS NULL THEN 0 
+	ELSE DENSE_RANK() OVER(PARTITION BY league_id, league_season, league_round_number 
+					  ORDER BY league_id, league_season, league_round_number, goals_season_l1 DESC) END AS scorer_rank_l1
+FROM lagged_goals
+ORDER BY league_id, league_season, league_round_number, goals_season_l1 DESC);
+
+DROP TABLE IF EXISTS fdm.tesis_lk_top_scorers_0;
+
 -- Top Assisters
-DROP TABLE IF EXISTS fdm.tesis_lk_top_assisters;
-CREATE TABLE fdm.tesis_lk_top_assisters AS (
+DROP TABLE IF EXISTS fdm.tesis_lk_top_assisters_0;
+CREATE TABLE fdm.tesis_lk_top_assisters_0 AS (
 WITH 
 rounds AS ( 
 	SELECT DISTINCT fixtures.league_id, fixtures.league_season, fixtures.league_round, rounds.league_round_number
@@ -79,9 +95,25 @@ ON rounds.league_id=assisters_round.league_id AND rounds.league_season=assisters
 	AND rounds.league_round=assisters_round.league_round AND assisters_season.player_id=assisters_round.player_id
 ORDER BY rounds.league_id, rounds.league_season, rounds.league_round_number, assists_season DESC);
 
+DROP TABLE IF EXISTS fdm.tesis_lk_top_assisters;
+CREATE TABLE fdm.tesis_lk_top_assisters AS (
+WITH lagged_assists AS(
+SELECT *,
+	LAG(assists_season, 1) OVER(PARTITION BY league_id, league_season, player_id ORDER BY league_id, league_season, league_round_number) AS assists_season_l1
+FROM fdm.tesis_lk_top_assisters_0)
+SELECT 
+	*,
+	CASE WHEN assists_season_l1=0 OR assists_season_l1 IS NULL THEN 0 
+	ELSE DENSE_RANK() OVER(PARTITION BY league_id, league_season, league_round_number 
+					  ORDER BY league_id, league_season, league_round_number, assists_season_l1 DESC) END AS assister_rank_l1
+FROM lagged_assists
+ORDER BY league_id, league_season, league_round_number, assists_season_l1 DESC);
+
+DROP TABLE IF EXISTS fdm.tesis_lk_top_assisters_0;
+
 -- Top Goals Saved (by GK)
-DROP TABLE IF EXISTS fdm.tesis_lk_top_savers;
-CREATE TABLE fdm.tesis_lk_top_savers AS (
+DROP TABLE IF EXISTS fdm.tesis_lk_top_savers_0;
+CREATE TABLE fdm.tesis_lk_top_savers_0 AS (
 WITH 
 rounds AS ( 
 	SELECT DISTINCT fixtures.league_id, fixtures.league_season, fixtures.league_round, rounds.league_round_number
@@ -118,3 +150,19 @@ LEFT JOIN savers_round
 ON rounds.league_id=savers_round.league_id AND rounds.league_season=savers_round.league_season
 	AND rounds.league_round=savers_round.league_round AND savers_season.player_id=savers_round.player_id
 ORDER BY rounds.league_id, rounds.league_season, rounds.league_round_number, saves_season DESC);
+
+DROP TABLE IF EXISTS fdm.tesis_lk_top_savers;
+CREATE TABLE fdm.tesis_lk_top_savers AS (
+WITH lagged_saves AS(
+SELECT *,
+	LAG(saves_season, 1) OVER(PARTITION BY league_id, league_season, player_id ORDER BY league_id, league_season, league_round_number) AS saves_season_l1
+FROM fdm.tesis_lk_top_savers_0)
+SELECT 
+	*,
+	CASE WHEN saves_season_l1=0 OR saves_season_l1 IS NULL THEN 0 
+	ELSE DENSE_RANK() OVER(PARTITION BY league_id, league_season, league_round_number 
+					  ORDER BY league_id, league_season, league_round_number, saves_season_l1 DESC) END AS saver_rank_l1
+FROM lagged_saves
+ORDER BY league_id, league_season, league_round_number, saves_season_l1 DESC);
+
+DROP TABLE IF EXISTS fdm.tesis_lk_top_savers_0;

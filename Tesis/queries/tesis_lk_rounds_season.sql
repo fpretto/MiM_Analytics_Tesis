@@ -4,7 +4,8 @@ CREATE TABLE fdm.tesis_lk_rounds_season AS (
 SELECT
 	matches.league_id,
 	matches.league_season,
-	MAX(rounds.league_round_number) AS total_rounds
+	MAX(rounds.league_round_number) AS total_rounds,
+	COUNT(DISTINCT teams_home_id) AS total_teams
 	
 FROM fdm.ft_api_matches AS matches
 LEFT JOIN fdm.lk_csv_league_rounds AS rounds
