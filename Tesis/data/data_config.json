@@ -4,20 +4,20 @@
 			"continents": {"process": "False"},
 			"countries": {"process": "False"},
 			"timezones": {"process": "False"},
-			"venues": {"process": "False", "params": {"country": ["Mexico"]}},
+			"venues": {"process": "True", "params": {"country": ["England"]}},
 			"leagues": {"process": "False"},
-			"teams": {"process": "False", "params": {"country": [], "league": [722], "season": [2020]}},
-			"matches": {"process": "False", "params": {"league": [722], "season": [2020]}},
-			"matches_events": {"process": "False", "params": {"league": [722], "season": [2020], "fixture_id": []}},
-			"predictions": {"process":  "False", "params": {"league": [722], "season": [2020], "fixture_id": []}},
-			"standings": {"process":  "False", "params": {"league": [722], "season": [2020]}}
+			"teams": {"process": "True", "params": {"country": [], "league": [39], "season": [2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020]}},
+			"matches": {"process": "True", "params": {"league": [39], "season": [2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020]}},
+			"matches_events": {"process": "True", "params": {"league": [39], "season": [2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020], "fixture_id": []}},
+			"predictions": {"process":  "True", "params": {"league": [39], "season": [2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020], "fixture_id": []}},
+			"standings": {"process":  "False", "params": {"league": [39], "season": [2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020]}}
 		},
 		"csv": {
 			"continents": {"process":  "False"},
 			"countries": {"process":  "False"},
 			"timezones": {"process":  "False"},
 			"league_rounds": {"process":  "False"},
-			"timezones_br_mx": {"process":  "True"}
+			"timezones_br_mx": {"process":  "False"}
 		}
 	},
 	"queries": {

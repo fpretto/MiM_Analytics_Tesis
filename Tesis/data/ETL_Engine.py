@@ -1,6 +1,6 @@
-from data.Extract import Extract
-from data.Transformation import Transformation
-from data.Load_PostgreSQL import PostgreSQL
+from Extract import Extract
+from Transformation import Transformation
+from Load_PostgreSQL import PostgreSQL
 import json
 import pandas as pd
 import distutils.util

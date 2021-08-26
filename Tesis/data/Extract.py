@@ -12,7 +12,8 @@ class Extract:
         self.csv_path = self.data_sources['data_sources']['csv']
         self.dict_countries = {'AR': 'Argentina', 'BO': 'Bolivia', 'BR': 'Brazil', 'CL': 'Chile', 'CO': 'Colombia',
                                'EC': 'Ecuador', 'PY': 'Paraguay', 'PE': 'Peru', 'UY': 'Uruguay', 'VE': 'Venezuela',
-                               'MX': 'Mexico'}
+                               'MX': 'Mexico', 'ES': 'Spain', 'FR': 'France', 'IT': 'Italy', 'BE': 'Belgium',
+                               'NL': 'Netherlands', 'GB': 'England', 'DE': 'Germany', 'PT': 'Portugal'}
 
     def getCSVData(self, csv_name, separator):
         # since we can use multiple CSV data files in future,

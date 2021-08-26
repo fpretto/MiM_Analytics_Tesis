@@ -9,7 +9,8 @@ class Transformation:
         self.data = response
         self.dict_countries = {'AR': 'Argentina', 'BO': 'Bolivia', 'BR': 'Brazil', 'CL': 'Chile', 'CO': 'Colombia',
                                'EC': 'Ecuador', 'PY': 'Paraguay', 'PE': 'Peru', 'UY': 'Uruguay', 'VE': 'Venezuela',
-                               'MX': 'Mexico'}
+                               'MX': 'Mexico', 'ES': 'Spain', 'FR': 'France', 'IT': 'Italy', 'BE': 'Belgium',
+                               'NL': 'Netherlands', 'GB': 'England', 'DE': 'Germany', 'PT': 'Portugal'}
 
     # Countries Data Transformation
     def csv_continents(self):
