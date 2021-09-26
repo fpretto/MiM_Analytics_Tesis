@@ -2,7 +2,7 @@
 select * from fdm.lk_api_leagues l
 left join fdm.lk_api_countries co
 on l.country_code=co.country_code_2
-where continent_code='SA'
+where l.country_name='World' -- IN ('DE', 'ES', 'FR', 'NL', 'IT', 'PT', 'BE') OR l.country_name='England'
 order by country_code, league_id
 
 -- Leagues and Seasons
@@ -10,12 +10,12 @@ select * from fdm.lk_api_leagues
 where league_id=128
 
 select * from fdm.lk_api_seasons
-where league_id=722
+where league_id=140
 order by league_id, season
 
 
-SELECT * FROM fdm.fp_leagues_completeness
-WHERE country_name='Mexico'
+SELECT * FROM fdm.tesis_lk_leagues_completeness
+--WHERE country_name='Mexico'
 ORDER BY country_name, league_id, league_season
 */
 
