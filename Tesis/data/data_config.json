@@ -4,13 +4,15 @@
 			"continents": {"process": "False"},
 			"countries": {"process": "False"},
 			"timezones": {"process": "False"},
-			"venues": {"process": "True", "params": {"country": ["England"]}},
+			"venues": {"process": "False", "params": {"country": ["Belgium", "Netherlands", "Portugal"]}},
 			"leagues": {"process": "False"},
-			"teams": {"process": "True", "params": {"country": [], "league": [39], "season": [2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020]}},
-			"matches": {"process": "True", "params": {"league": [39], "season": [2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020]}},
-			"matches_events": {"process": "True", "params": {"league": [39], "season": [2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020], "fixture_id": []}},
-			"predictions": {"process":  "True", "params": {"league": [39], "season": [2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020], "fixture_id": []}},
-			"standings": {"process":  "False", "params": {"league": [39], "season": [2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020]}}
+			"teams": {"process": "False", "params": {"country": [], "league": [88, 94, 144], "season": [2015,2016,2017,2018,2019,2020]}},
+			"matches": {"process": "False", "params": {"league": [88, 94, 144], "season": [2015,2016,2017,2018,2019,2020]}},
+			"matches_events": {"process": "False", "params": {"league": [88, 94, 144], "season": [2015,2016,2017,2018,2019,2020], "fixture_id": []}},
+			"predictions": {"process":  "False", "params": {"league": [88, 94, 144], "season": [2015,2016,2017,2018,2019,2020], "fixture_id": []}},
+			"standings": {"process":  "False", "params": {"league": [88, 94, 144], "season": [2015,2016,2017,2018,2019,2020]}},
+			"transfers": {"process":  "False", "params": {"league": [71, 265, 239, 281, 262]}},
+			"trophies": {"process":  "True", "params": {"league": [71, 128, 265, 239, 281, 262]}}
 		},
 		"csv": {
 			"continents": {"process":  "False"},
@@ -53,7 +55,8 @@
 					"match_lineups": "/fixtures/lineups",
 					"match_player_stats": "/fixtures/players",
 					"predictions": "/predictions",
-					"transfers": "/predictions"
+					"transfers": "/transfers",
+					"trophies": "/trophies"
 				}
 			}
 		},

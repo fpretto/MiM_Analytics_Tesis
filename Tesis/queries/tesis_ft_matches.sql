@@ -5,6 +5,8 @@ CREATE TABLE fdm.tesis_ft_matches AS (
 SELECT 
 	rounds.country_name,
 	rounds.country_code,
+	countries.continent_code,
+	continents.continent_name,
 	matches.league_id,
 	rounds.league_name,
 	rounds.league_type,
@@ -38,6 +40,10 @@ LEFT JOIN fdm.lk_api_venues_tz as tzs_venue
 	ON matches.venue_id=tzs_venue.venue_id
 LEFT JOIN fdm.lk_csv_league_rounds AS rounds
 	ON matches.league_id=rounds.league_id AND matches.league_season=rounds.league_season AND matches.league_round=rounds.league_round
+LEFT JOIN fdm.lk_api_countries AS countries
+	ON rounds.country_code=countries.country_code_2
+LEFT JOIN fdm.lk_api_continents AS continents
+	ON countries.continent_code=continents.continent_code
 LEFT JOIN (SELECT DISTINCT country_code_2, pg_timezone FROM fdm.lk_api_venues_tz 
 			 WHERE pg_timezone NOT IN ('Mexico/BajaSur', 'Mexico/BajaNorte', 'Brazil/Acre', 'Brazil/West')) as tzs_country
 	ON rounds.country_code=tzs_country.country_code_2
@@ -45,4 +51,3 @@ WHERE CAST(matches.league_id AS text)||CAST(matches.league_season AS text) IN (
 	SELECT CAST(league_id AS text)||CAST(league_season AS text) FROM fdm.tesis_lk_leagues) 
 ORDER BY country_name, league_id, league_season, league_round_number
 )
-

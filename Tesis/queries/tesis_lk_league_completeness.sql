@@ -15,7 +15,7 @@ order by league_id, season
 
 
 SELECT * FROM fdm.tesis_lk_leagues_completeness
---WHERE country_name='Mexico'
+WHERE league_id=144
 ORDER BY country_name, league_id, league_season
 */
 

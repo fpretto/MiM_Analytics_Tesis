@@ -264,6 +264,51 @@ class ETL_Engine:
                     print(f"Error procesando standings de la Temporada {str(season)} de la "
                           f"Liga {str(league_id)}: %s" % error)
 
+    def etl_transfers(self):
+        for league_id in self.etl_data['ETL']['api']['transfers']['params']['league']:
+            print(f'Procesando Transfers de la Liga {str(league_id)}')
+
+            # Retrieve all teams of the league
+            query_check = f"SELECT DISTINCT teams_home_id FROM fdm.ft_api_matches WHERE league_id={league_id}"
+            lk_api_teams = pd.read_sql_query(query_check, self.pgEngine.conn)
+
+            # Add transfers
+            for team_id in lk_api_teams['teams_home_id'].unique():
+                query = f'?team={str(team_id)}'
+                try:
+                    api_response = self.extractObj.getAPIFootballData(endpoint='transfers', query=query)
+                    df_transfers = Transformation(response=api_response).api_transfers()
+                    self.pgEngine.load_batch(df=df_transfers, table_name='lk_api_transfers')
+
+                except Exception as error:
+                    print(f"Error procesando transfers del equipo {str(team_id)} de la "
+                          f"Liga {str(league_id)}: %s" % error)
+
+    def etl_trophies(self):
+        for league_id in self.etl_data['ETL']['api']['trophies']['params']['league']:
+            print(f'Procesando Transfers de la Liga {str(league_id)}')
+
+            # Retrieve all teams of the league
+            query_check = f"SELECT DISTINCT player_id FROM fdm.ft_api_matches_stats_players AS stats_players " \
+                          f"LEFT JOIN fdm.ft_api_matches AS matches " \
+                          f"ON stats_players.fixture_id=matches.fixture_id " \
+                          f"WHERE matches.league_id={league_id}"
+
+            lk_api_players = pd.read_sql_query(query_check, self.pgEngine.conn)
+
+            # Add standings
+            for player_id in lk_api_players['player_id'].unique():
+                query = f'?player={str(player_id)}'
+                try:
+                    api_response = self.extractObj.getAPIFootballData(endpoint='trophies', query=query)
+                    if len(api_response['response']) > 0:
+                        df_trophies = Transformation(response=api_response).api_trophies(player_id)
+                        self.pgEngine.load_batch(df=df_trophies, table_name='lk_api_trophies')
+
+                except Exception as error:
+                    print(f"Error procesando trophies del jugador {str(player_id)} de la "
+                          f"Liga {str(league_id)}: %s" % error)
+
 if __name__ == '__main__':
 
     etl_data = json.load(open('data_config.json'))

@@ -364,5 +364,34 @@ class Transformation:
         except Exception as error:
             print(f"Error procesando Standings: %s" % error)
 
+    def api_transfers(self):
+        try:
+            df_transfers = pd.DataFrame()
+            for idx in range(len(self.data['response'])):
+                transfer = pd.json_normalize(self.data['response'][idx]['transfers'], sep='_')
+                transfer.loc[:, 'player_id'] = pd.json_normalize(self.data['response'][idx], sep='_')['player_id'].values
+                transfer.loc[:, 'player_name'] = pd.json_normalize(self.data['response'][idx], sep='_')['player_name'].values
 
+                df_transfers = df_transfers.append(transfer).reset_index(drop=True)
+
+            df_transfers['teams_in_id'] = df_transfers['teams_in_id'].astype(str)
+            df_transfers['teams_out_id'] = df_transfers['teams_out_id'].astype(str)
+            df_transfers['player_id'] = df_transfers['player_id'].astype(str)
+
+            return df_transfers
+
+        except Exception as error:
+            print(f"Error procesando Transfers: %s" % error)
+
+    def api_trophies(self, player_id):
+        try:
+            df_trophies_player = pd.json_normalize(self.data['response'], sep='_')
+            df_trophies_player['player_id'] = player_id
+            df_trophies_player['trophy_n'] = (df_trophies_player.index - df_trophies_player.index.max()) * -1 + 1
+            cols = ['player_id', 'trophy_n', 'country', 'league', 'season', 'place']
+
+            return df_trophies_player[cols]
+
+        except Exception as error:
+            print(f"Error procesando Trophies: %s" % error)
 

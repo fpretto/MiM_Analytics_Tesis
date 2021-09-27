@@ -5,6 +5,8 @@ SELECT
 -- Match Info
 	matches.country_name,
 	matches.country_code,
+	matches.continent_code,
+	matches.continent_name,
 	matches.league_id,
 	matches.league_name,
 	matches.league_type,
