@@ -16,9 +16,6 @@
 import pandas as pd
 import numpy as np
 
-PATH = 'C:/Users/E0662122/Repo/MiM_Analytics_Tesis/Tesis/'
-# TODO: pasar path a config file del perf index
-
 ######################################################################
 # SETTINGS
 ######################################################################
@@ -45,10 +42,6 @@ dict_cols = {"player_cols": ['player_id', 'player_name', 'player_preferred_posit
 ######################################################################
 # DATA PREPARATION & FILTER
 ######################################################################
-
-#df = pd.read_csv(PATH + 'AR_20211019.csv', sep='|', decimal='.')
-#rating_correction = pd.read_csv(PATH + 'rating_correction.csv', sep='|', decimal='.')
-# TODO: cargar ARs en el main
 
 def filter_and_data_engineering(df_ar, rating_correction):
 
