@@ -1,5 +1,5 @@
 {
   "data_sources": {
-    "master_path":  "C:/Users/E0662122/Repo/MiM_Analytics_Tesis/Tesis/",
+    "master_path":  "C:/Repo/MiM_Analytics_Tesis/Tesis/",
     "AR": "AR_20211019.csv",
     "rating_correction": "rating_correction.csv"}}
