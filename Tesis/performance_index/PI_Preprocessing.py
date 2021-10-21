@@ -119,7 +119,7 @@ def filter_and_data_engineering(df_ar, rating_correction):
     return df
 
 
-def normalize_by_position(df, dict_cols, scaler='Robust'):
+def normalize_by_position(df, scaler='Robust'):
 
     from sklearn.preprocessing import MinMaxScaler, RobustScaler, StandardScaler
 
