@@ -10,7 +10,7 @@ select * from fdm.lk_api_leagues
 where league_id=128
 
 select * from fdm.lk_api_seasons
-where league_id=140
+where league_id=71
 order by league_id, season
 
 
@@ -20,7 +20,7 @@ ORDER BY country_name, league_id, league_season
 */
 
 -- Check all
-DROP TABLE fdm.tesis_lk_leagues_completeness;
+DROP TABLE IF EXISTS fdm.tesis_lk_leagues_completeness;
 CREATE TABLE fdm.tesis_lk_leagues_completeness AS (
 select 
 
@@ -34,17 +34,17 @@ select
 	events.events,
 	lineups_teams.lineups_teams,
 	lineups_players.lineups_players,
-	preds.predictions,
+	--preds.predictions,
 	stats_teams.stats_teams,
 	stats_players.stats_players,
-	stands.standings_teams,
+	--stands.standings_teams,
 	ROUND(events.events/CAST(matches.matches AS float)*100) AS events_pct,
 	ROUND(lineups_teams.lineups_teams/CAST(matches.matches AS float)*100) AS lineup_teams_pct,
 	ROUND(lineups_players.lineups_players/CAST(matches.matches AS float)*100) AS lineup_players_pct,
-	ROUND(preds.predictions/CAST(matches.matches AS float)*100) AS predictions_pct,
+	--ROUND(preds.predictions/CAST(matches.matches AS float)*100) AS predictions_pct,
 	ROUND(stats_teams.stats_teams/CAST(matches.matches AS float)*100) AS stats_teams_pct,
-	ROUND(stats_players.stats_players/CAST(matches.matches AS float)*100) AS stats_players_pct,
-	ROUND(stands.standings_teams/CAST(matches.matches AS float)*100) AS standings_pct
+	ROUND(stats_players.stats_players/CAST(matches.matches AS float)*100) AS stats_players_pct
+	--ROUND(stands.standings_teams/CAST(matches.matches AS float)*100) AS standings_pct
 	
 from
 -- Matches
@@ -79,13 +79,13 @@ group by fix.league_id, fix.league_season) as lineups_players
 on matches.league_id=lineups_players.league_id and matches.league_season=lineups_players.league_season
 left join
 -- Predictions
-(select fix.league_id, fix.league_season, count(distinct pred.fixture_id) as predictions
+/*(select fix.league_id, fix.league_season, count(distinct pred.fixture_id) as predictions
 from fdm.ft_api_matches_predictions as pred
 left join fdm.ft_api_matches as fix
 on pred.fixture_id=fix.fixture_id
 group by fix.league_id, fix.league_season) as preds
 on matches.league_id=preds.league_id and matches.league_season=preds.league_season
-left join
+left join*/
 -- Stats Players
 (select fix.league_id, fix.league_season, count(distinct stats.fixture_id) as stats_players
 from fdm.ft_api_matches_stats_players as stats
@@ -101,10 +101,10 @@ left join fdm.ft_api_matches as fix
 on stats.fixture_id=fix.fixture_id
 group by fix.league_id, fix.league_season) as stats_teams
 on matches.league_id=stats_teams.league_id and matches.league_season=stats_teams.league_season
-left join
+/*left join
 -- Standings
 (select league_id, league_season, count(*) as standings_teams from fdm.ft_api_standings
 where league_id=128
 group by league_id, league_season) as stands
-on matches.league_id=stands.league_id and matches.league_season=stands.league_season
+on matches.league_id=stands.league_id and matches.league_season=stands.league_season*/
 	)

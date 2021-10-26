@@ -17,9 +17,9 @@
 PATH_REPO = 'C:/Repo/MiM_Analytics_Tesis/Tesis/performance_index/'
 
 import pandas as pd
-import numpy as np
 import json
 import sys
+import joblib
 sys.path.insert(0, PATH_REPO)
 import PI_Preprocessing
 import PI_FactorAnalysis
@@ -46,21 +46,32 @@ dict_cols = {"player_cols": ['player_id', 'player_name', 'player_preferred_posit
                          'interceptions_p90', 'penalty_committed_p90']
              }
 
-# Load files
+## Load files
 f = open(PATH_REPO+"ConfigFile.json", "r")
 inputs = json.loads(f.read())
 
 AR = pd.read_csv(inputs['data_sources']['master_path']+inputs['data_sources']['AR'], encoding='utf-8', decimal='.', sep='|')
 rating_correction = pd.read_csv(inputs['data_sources']['master_path']+inputs['data_sources']['rating_correction'], encoding='utf-8', decimal='.', sep='|')
 
-# Preprocessing
+## Preprocessing
 df = PI_Preprocessing.filter_and_data_engineering(AR, rating_correction)
-df_gk, df_df, df_mf, df_fw = PI_Preprocessing.normalize_by_position(df, dict_cols, scaler='Robust') # [Robust, Standard, MinMax]
+df_gk, df_df, df_mf, df_fw, dict_scalers = PI_Preprocessing.normalize_by_position(df, dict_cols, scaler='Robust') # [Robust, Standard, MinMax]
 
-# Create Index
+## Create Index
 dict_weights = {}
+# Forwards
 df_fw, dict_weights = PI_FactorAnalysis.create_index(df_fw, dict_cols['fw_cols'], dict_weights, position='F', factors=4,
                                                      factors_method='principal', factors_rotation='varimax')
+# Midfielders
+df_mf, dict_weights = PI_FactorAnalysis.create_index(df_mf, dict_cols['mf_cols'], dict_weights, position='M', factors=4,
+                                                     factors_method='principal', factors_rotation='varimax')
+# Defenders
+df_df, dict_weights = PI_FactorAnalysis.create_index(df_df, dict_cols['df_cols'], dict_weights, position='D', factors=4,
+                                                     factors_method='principal', factors_rotation='varimax')
+# Goalkeepers
+df_gk, dict_weights = PI_FactorAnalysis.create_index(df_gk, dict_cols['gk_cols'], dict_weights, position='G', factors=5,
+                                                     factors_method='principal', factors_rotation='varimax')
 
-dict_weights
-df_fw.sort_values('Perf_Index_scaled', ascending=False)
+## Export
+dict_perf_index = {'cols': dict_cols, 'scalers': dict_scalers, 'index_weights': dict_weights}
+joblib.dump(dict_perf_index, PATH_REPO+'PerformanceIndexObject.pkl')

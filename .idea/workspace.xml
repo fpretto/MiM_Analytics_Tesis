@@ -78,7 +78,7 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="preferences.keymap" />
   </component>
-  <component name="RunManager" selected="Python.ETL_Engine">
+  <component name="RunManager" selected="Python.Update_TesisData_PostgreSQL">
     <configuration name="ETL_Engine" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="MiM_Analytics_Tesis" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -144,9 +144,9 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.Update_TesisData_PostgreSQL" />
         <item itemvalue="Python.ETL_Engine" />
         <item itemvalue="Python.app" />
-        <item itemvalue="Python.Update_TesisData_PostgreSQL" />
       </list>
     </recent_temporary>
   </component>

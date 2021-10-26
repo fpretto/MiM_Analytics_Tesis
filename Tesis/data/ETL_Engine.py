@@ -1,11 +1,15 @@
-from Extract import Extract
-from Transformation import Transformation
-from Load_PostgreSQL import PostgreSQL
+
 import json
 import pandas as pd
 import distutils.util
+import sys
+PATH_REPO = 'C:/Repo/MiM_Analytics_Tesis/Tesis/data'
+sys.path.insert(0, PATH_REPO)
+from Extract import Extract
+from Transformation import Transformation
+from Load_PostgreSQL import PostgreSQL
 
-#etl_data = json.load(open('data/data_config.json'))
+#etl_data = json.load(open(PATH_REPO+'/data_config.json'))
 #extractObj = Extract(etl_data)
 #pgEngine = PostgreSQL(etl_data)
 
@@ -40,7 +44,7 @@ class ETL_Engine:
 
     # Countries
     def etl_countries(self):
-        csv_countries = self.extractObj.getCSVData(csv_name='countries', separator=',')
+        csv_countries = self.extractObj.getCSVData(csv_name='countries', separator=';')
         df_countries = Transformation(response=csv_countries).csv_countries()
         self.pgEngine.load_batch(df=df_countries, table_name='lk_api_countries')
 
@@ -56,10 +60,14 @@ class ETL_Engine:
         csv_rounds = self.extractObj.getCSVData(csv_name='league_rounds', separator=';')
         self.pgEngine.load_batch(df=csv_rounds, table_name='lk_csv_league_rounds')
 
-    # Timezones Brazil
-    def etl_timezones_br_mx(self):
-        csv_tz = self.extractObj.getCSVData(csv_name='timezones_br_mx', separator=';')
-        self.pgEngine.load_batch(df=csv_tz, table_name='lk_csv_timezones_br_mx')
+    # Timezones
+    def etl_timezones(self):
+        csv_tz = self.extractObj.getCSVData(csv_name='timezones', separator=',')
+        self.pgEngine.load_batch(df=csv_tz, table_name='lk_csv_timezones')
+
+        # Brazil/Mexico
+        csv_tz_br_mx = self.extractObj.getCSVData(csv_name='timezones_br_mx', separator=';')
+        self.pgEngine.load_batch(df=csv_tz_br_mx, table_name='lk_csv_timezones_br_mx')
 
     # Venues
     def etl_venues(self):
@@ -162,15 +170,10 @@ class ETL_Engine:
                                 query = f'?fixture={fixture}'
                                 # Extract
                                 print('Extract')
-                                api_response_stats = self.extractObj.getAPIFootballData(endpoint='match_stats',
-                                                                                        query=query)
-                                api_response_events = self\
-                                    .extractObj.getAPIFootballData(endpoint='match_events',
-                                                                                         query=query)
-                                api_response_player_stats = self.extractObj.getAPIFootballData(endpoint='match_player_stats',
-                                                                                               query=query)
-                                api_response_lineups = self.extractObj.getAPIFootballData(endpoint='match_lineups',
-                                                                                          query=query)
+                                api_response_stats = self.extractObj.getAPIFootballData(endpoint='match_stats', query=query)
+                                api_response_events = self.extractObj.getAPIFootballData(endpoint='match_events', query=query)
+                                api_response_player_stats = self.extractObj.getAPIFootballData(endpoint='match_player_stats', query=query)
+                                api_response_lineups = self.extractObj.getAPIFootballData(endpoint='match_lineups', query=query)
 
                                 # Transform
                                 print('Transform')
@@ -308,6 +311,9 @@ class ETL_Engine:
                 except Exception as error:
                     print(f"Error procesando trophies del jugador {str(player_id)} de la "
                           f"Liga {str(league_id)}: %s" % error)
+
+
+
 
 if __name__ == '__main__':
 

@@ -4,21 +4,21 @@
 			"continents": {"process": "False"},
 			"countries": {"process": "False"},
 			"timezones": {"process": "False"},
-			"venues": {"process": "False", "params": {"country": ["Belgium", "Netherlands", "Portugal"]}},
+			"venues": {"process": "False", "params": {"country": ["Bolivia",  "Brazil",  "Chile",  "Colombia", "Ecuador",  "Paraguay",  "Peru",  "Uruguay", "Venezuela", "Mexico"]}},
 			"leagues": {"process": "False"},
-			"teams": {"process": "False", "params": {"country": [], "league": [88, 94, 144], "season": [2015,2016,2017,2018,2019,2020]}},
-			"matches": {"process": "False", "params": {"league": [88, 94, 144], "season": [2015,2016,2017,2018,2019,2020]}},
-			"matches_events": {"process": "False", "params": {"league": [88, 94, 144], "season": [2015,2016,2017,2018,2019,2020], "fixture_id": []}},
-			"predictions": {"process":  "False", "params": {"league": [88, 94, 144], "season": [2015,2016,2017,2018,2019,2020], "fixture_id": []}},
-			"standings": {"process":  "False", "params": {"league": [88, 94, 144], "season": [2015,2016,2017,2018,2019,2020]}},
-			"transfers": {"process":  "False", "params": {"league": [71, 265, 239, 281, 262]}},
-			"trophies": {"process":  "True", "params": {"league": [71, 128, 265, 239, 281, 262]}}
+			"teams": {"process": "False", "params": {"country": ["Bolivia",  "Brazil",  "Chile",  "Colombia", "Ecuador",  "Paraguay",  "Peru",  "Uruguay", "Venezuela", "Mexico"], "league": [], "season": [2015,2016,2017,2018,2019,2020]}},
+			"matches": {"process": "False", "params": {"league": [239,242,281,250,268], "season": [2016,2017,2018,2019,2020]}},
+			"matches_events": {"process": "False", "params": {"league": [239,242,281,250,268], "season": [2016,2017,2018,2019,2020], "fixture_id": []}},
+			"predictions": {"process":  "False", "params": {"league": [128], "season": [2016,2017,2018,2019,2020], "fixture_id": []}},
+			"standings": {"process":  "False", "params": {"league": [128], "season": [2016,2017,2018,2019,2020]}},
+			"transfers": {"process":  "False", "params": {"league": [128, 71, 239, 242, 250, 262, 265, 268, 281]}},
+			"trophies": {"process":  "False", "params": {"league": [128, 71, 239, 242, 250, 262, 265, 268, 281]}}
 		},
 		"csv": {
 			"continents": {"process":  "False"},
 			"countries": {"process":  "False"},
 			"timezones": {"process":  "False"},
-			"league_rounds": {"process":  "False"},
+			"league_rounds": {"process":  "True"},
 			"timezones_br_mx": {"process":  "False"}
 		}
 	},
@@ -82,3 +82,4 @@
 		}
 	}
 }
+

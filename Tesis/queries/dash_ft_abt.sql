@@ -56,8 +56,8 @@ WHERE row_n=1);
 DROP TABLE IF EXISTS fdm.dash_ft_abt;
 CREATE TABLE fdm.dash_ft_abt AS (
 SELECT
-	teams.country_code,
-	teams.country_name,
+	teams.team_country_code,
+	teams.team_country,
 	matches.league_id,
 	leagues.league_name,
 	leagues.league_type,
@@ -67,7 +67,7 @@ SELECT
 	player_positions.player_position AS player_preferred_position,
 	player_numbers.player_number AS player_preferred_number,
 	stats_players.team_id,
-	teams.name AS team_name,
+	teams.team_name,
 	SUM(player_minutes) AS player_minutes,
 	SUM(player_rating*player_minutes)/NULLIF(SUM(player_minutes), 0) wavg_player_rating,
 	SUM(stats_players.offsides) AS offsides,
@@ -83,18 +83,18 @@ SELECT
 	SUM(stats_players.tackles_total) AS tackles_total,
 	SUM(stats_players.tackles_blocks) AS tackles_blocks,
 	SUM(stats_players.tackles_interceptions) AS tackles_interceptions,
-	SUM(CASE WHEN stats_teams.ball_possesion=0 THEN stats_players.tackles_total ELSE stats_players.tackles_total*0.5/stats_teams.ball_possesion END) AS tackles_total_padj,
-	SUM(CASE WHEN stats_teams.ball_possesion=0 THEN stats_players.tackles_blocks ELSE stats_players.tackles_blocks*0.5/stats_teams.ball_possesion END) AS tackles_blocks_padj,
-	SUM(CASE WHEN stats_teams.ball_possesion=0 THEN stats_players.tackles_interceptions ELSE stats_players.tackles_interceptions*0.5/stats_teams.ball_possesion END) AS tackles_interceptions_padj,
+	SUM(CASE WHEN stats_teams.ball_possession=0 THEN stats_players.tackles_total ELSE stats_players.tackles_total*0.5/stats_teams.ball_possession END) AS tackles_total_padj,
+	SUM(CASE WHEN stats_teams.ball_possession=0 THEN stats_players.tackles_blocks ELSE stats_players.tackles_blocks*0.5/stats_teams.ball_possession END) AS tackles_blocks_padj,
+	SUM(CASE WHEN stats_teams.ball_possession=0 THEN stats_players.tackles_interceptions ELSE stats_players.tackles_interceptions*0.5/stats_teams.ball_possession END) AS tackles_interceptions_padj,
 	SUM(stats_players.duels_total) AS duels_total,
 	SUM(stats_players.duels_won) AS duels_won,
 	SUM(stats_players.dribbles_attemps) AS dribbles_attemps,
 	SUM(stats_players.dribbles_success) AS dribbles_success,
 	SUM(stats_players.dribbles_past) AS dribbles_past,
-	SUM(CASE WHEN stats_teams.ball_possesion=0 THEN stats_players.dribbles_past ELSE stats_players.dribbles_past*0.5/stats_teams.ball_possesion END) AS dribbles_past_padj,
+	SUM(CASE WHEN stats_teams.ball_possession=0 THEN stats_players.dribbles_past ELSE stats_players.dribbles_past*0.5/stats_teams.ball_possession END) AS dribbles_past_padj,
 	SUM(stats_players.fouls_drawn) AS fouls_drawn,
 	SUM(stats_players.fouls_committed) AS fouls_committed,
-	SUM(CASE WHEN stats_teams.ball_possesion=0 THEN stats_players.fouls_committed ELSE stats_players.fouls_committed*0.5/stats_teams.ball_possesion END) AS fouls_committed_padj,
+	SUM(CASE WHEN stats_teams.ball_possession=0 THEN stats_players.fouls_committed ELSE stats_players.fouls_committed*0.5/stats_teams.ball_possession END) AS fouls_committed_padj,
 	SUM(stats_players.cards_yellow) AS cards_yellow,
 	SUM(stats_players.cards_red) AS cards_red,
 	SUM(stats_players.penalty_won) AS penalty_won,
@@ -114,21 +114,20 @@ LEFT JOIN fdm.dash_lk_player_position AS player_positions
 LEFT JOIN fdm.dash_lk_player_number AS player_numbers
 	ON stats_players.player_id=player_numbers.player_id AND matches.league_season=player_numbers.league_season
 LEFT JOIN fdm.ft_api_matches_stats_teams AS stats_teams
-	ON stats_players.fixture_id=stats_teams.fixture_id AND stats_players.team_id=stats_teams.team_id
+	ON stats_players.fixture_id=stats_teams.fixture_id AND stats_players.team_id=stats_teams.teams_id
 LEFT JOIN fdm.lk_api_teams AS teams
 	ON stats_players.team_id=teams.team_id
 LEFT JOIN fdm.lk_api_leagues AS leagues
 	ON matches.league_id=leagues.league_id
-WHERE (CAST(matches.league_id AS text) || CAST(matches.league_season AS text)) IN (SELECT DISTINCT (CAST(league_id AS text) || CAST(league_season AS text)) FROM fdm.dash_lk_leagues)
-GROUP BY teams.country_code, teams.country_name, matches.league_id,	leagues.league_name, leagues.league_type, matches.league_season, 
+INNER JOIN fdm.dash_lk_leagues AS dash_leagues
+	ON matches.league_id=dash_leagues.league_id AND matches.league_season=dash_leagues.league_season
+GROUP BY teams.team_country_code, teams.team_country, matches.league_id,	leagues.league_name, leagues.league_type, matches.league_season, 
 		stats_players.player_id, player_names.player_name, player_positions.player_position, player_numbers.player_number,
-		stats_players.team_id, teams.name	
+		stats_players.team_id, teams.team_name	
 );
 
-SELECT * FROM fdm.dash_ft_abt
-WHERE player_name LIKE '%Marchesin'
-;
 
+/*
 SELECT count(*) FROM fdm.ft_api_matches_stats_teams
 where ball_possesion <= 0
 
@@ -142,3 +141,4 @@ SELECT players.*,
 	teams.ball_possesion FROM fdm.ft_api_matches_stats_players AS players
 LEFT JOIN fdm.ft_api_matches_stats_teams AS teams
 	ON players.fixture_id=teams.fixture_id AND players.team_id=teams.team_id
+*/

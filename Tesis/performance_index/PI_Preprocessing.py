@@ -107,20 +107,26 @@ def normalize_by_position(df, dict_cols, scaler='Robust'):
     df_df_0 = df[df['player_preferred_position'] == 'D'][dict_cols['player_cols'] + dict_cols['df_cols']].copy()
     df_gk_0 = df[df['player_preferred_position'] == 'G'][dict_cols['player_cols'] + dict_cols['gk_cols']].copy()
 
+    scaler_fw = dict_scalers[scaler].fit(df_fw_0[dict_cols['fw_cols']])
     df_fw = pd.concat([df_fw_0[dict_cols['player_cols']].reset_index(drop=True),
-                       pd.DataFrame(dict_scalers[scaler].fit_transform(df_fw_0[dict_cols['fw_cols']]),
+                       pd.DataFrame(scaler_fw.transform(df_fw_0[dict_cols['fw_cols']]),
                                     columns=dict_cols['fw_cols'])], axis=1)
 
+    scaler_mf = dict_scalers[scaler].fit(df_mf_0[dict_cols['mf_cols']])
     df_mf = pd.concat([df_mf_0[dict_cols['player_cols']].reset_index(drop=True),
-                       pd.DataFrame(dict_scalers[scaler].fit_transform(df_mf_0[dict_cols['mf_cols']]),
+                       pd.DataFrame(scaler_mf.transform(df_mf_0[dict_cols['mf_cols']]),
                                     columns=dict_cols['mf_cols'])], axis=1)
 
+    scaler_df = dict_scalers[scaler].fit(df_df_0[dict_cols['df_cols']])
     df_df = pd.concat([df_df_0[dict_cols['player_cols']].reset_index(drop=True),
-                       pd.DataFrame(dict_scalers[scaler].fit_transform(df_df_0[dict_cols['df_cols']]),
+                       pd.DataFrame(scaler_df.transform(df_df_0[dict_cols['df_cols']]),
                                     columns=dict_cols['df_cols'])], axis=1)
 
+    scaler_gk = dict_scalers[scaler].fit(df_gk_0[dict_cols['gk_cols']])
     df_gk = pd.concat([df_gk_0[dict_cols['player_cols']].reset_index(drop=True),
-                       pd.DataFrame(RobustScaler().fit_transform(df_gk_0[dict_cols['gk_cols']]),
+                       pd.DataFrame(scaler_gk.transform(df_gk_0[dict_cols['gk_cols']]),
                                     columns=dict_cols['gk_cols'])], axis=1)
 
-    return df_gk, df_df, df_mf, df_fw
+    dict_scalers = {'F': scaler_fw, 'M': scaler_mf, 'D': scaler_df, 'G': scaler_gk}
+
+    return df_gk, df_df, df_mf, df_fw, dict_scalers

@@ -69,18 +69,18 @@ SELECT
 	SUM(stats_players.tackles_total) AS tackles_total,
 	SUM(stats_players.tackles_blocks) AS tackles_blocks,
 	SUM(stats_players.tackles_interceptions) AS tackles_interceptions,
-	SUM(CASE WHEN stats_teams.ball_possesion=0 THEN stats_players.tackles_total ELSE stats_players.tackles_total*0.5/stats_teams.ball_possesion END) AS tackles_total_padj,
-	SUM(CASE WHEN stats_teams.ball_possesion=0 THEN stats_players.tackles_blocks ELSE stats_players.tackles_blocks*0.5/stats_teams.ball_possesion END) AS tackles_blocks_padj,
-	SUM(CASE WHEN stats_teams.ball_possesion=0 THEN stats_players.tackles_interceptions ELSE stats_players.tackles_interceptions*0.5/stats_teams.ball_possesion END) AS tackles_interceptions_padj,
+	SUM(CASE WHEN stats_teams.ball_possession=0 THEN stats_players.tackles_total ELSE stats_players.tackles_total*0.5/stats_teams.ball_possession END) AS tackles_total_padj,
+	SUM(CASE WHEN stats_teams.ball_possession=0 THEN stats_players.tackles_blocks ELSE stats_players.tackles_blocks*0.5/stats_teams.ball_possession END) AS tackles_blocks_padj,
+	SUM(CASE WHEN stats_teams.ball_possession=0 THEN stats_players.tackles_interceptions ELSE stats_players.tackles_interceptions*0.5/stats_teams.ball_possession END) AS tackles_interceptions_padj,
 	SUM(stats_players.duels_total) AS duels_total,
 	SUM(stats_players.duels_won) AS duels_won,
 	SUM(stats_players.dribbles_attemps) AS dribbles_attemps,
 	SUM(stats_players.dribbles_success) AS dribbles_success,
 	SUM(stats_players.dribbles_past) AS dribbles_past,
-	SUM(CASE WHEN stats_teams.ball_possesion=0 THEN stats_players.dribbles_past ELSE stats_players.dribbles_past*0.5/stats_teams.ball_possesion END) AS dribbles_past_padj,
+	SUM(CASE WHEN stats_teams.ball_possession=0 THEN stats_players.dribbles_past ELSE stats_players.dribbles_past*0.5/stats_teams.ball_possession END) AS dribbles_past_padj,
 	SUM(stats_players.fouls_drawn) AS fouls_drawn,
 	SUM(stats_players.fouls_committed) AS fouls_committed,
-	SUM(CASE WHEN stats_teams.ball_possesion=0 THEN stats_players.fouls_committed ELSE stats_players.fouls_committed*0.5/stats_teams.ball_possesion END) AS fouls_committed_padj,
+	SUM(CASE WHEN stats_teams.ball_possession=0 THEN stats_players.fouls_committed ELSE stats_players.fouls_committed*0.5/stats_teams.ball_possession END) AS fouls_committed_padj,
 	SUM(stats_players.cards_yellow) AS cards_yellow,
 	SUM(stats_players.cards_red) AS cards_red,
 	SUM(stats_players.penalty_won) AS penalty_won,
@@ -102,6 +102,6 @@ LEFT JOIN fdm.dash_lk_player_position_all_seasons AS player_positions
 LEFT JOIN fdm.dash_lk_player_number_all_seasons AS player_numbers
 	ON stats_players.player_id=player_numbers.player_id
 LEFT JOIN fdm.ft_api_matches_stats_teams AS stats_teams
-	ON stats_players.fixture_id=stats_teams.fixture_id AND stats_players.team_id=stats_teams.team_id
+	ON stats_players.fixture_id=stats_teams.fixture_id AND stats_players.team_id=stats_teams.teams_id
 GROUP BY stats_players.player_id, player_names.player_name, player_positions.player_position, player_numbers.player_number
 );

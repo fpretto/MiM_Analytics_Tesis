@@ -18,4 +18,4 @@ SELECT
 FROM fdm.lk_api_venues AS venues
 LEFT JOIN fdm.lk_csv_timezones_br_mx AS tz_br_mx 
 	ON venues.venue_id=tz_br_mx.venue_id
-)
+);

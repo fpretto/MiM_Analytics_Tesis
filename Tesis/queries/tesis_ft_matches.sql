@@ -14,18 +14,18 @@ SELECT
 	matches.league_round,
 	rounds.league_round_number,
 	matches.fixture_id,
-	referee,
-	date_tz,
-	CASE WHEN (rounds.country_code='BR' OR rounds.country_code='MX') AND (matches.venue_id>0 AND tzs_venue.pg_timezone IS NOT NULL) 
-		THEN to_timestamp(date_tz, 'YYYY-MM-DD"T"HH24:MI:SS') AT time zone tzs_venue.pg_timezone 
-		ELSE to_timestamp(date_tz, 'YYYY-MM-DD"T"HH24:MI:SS') AT time zone tzs_country.pg_timezone	END AS date_timestamp,
-	CASE WHEN (rounds.country_code='BR' OR rounds.country_code='MX') AND (matches.venue_id>0 AND tzs_venue.pg_timezone IS NOT NULL) 
-		THEN DATE(to_timestamp(date_tz, 'YYYY-MM-DD"T"HH24:MI:SS') AT time zone tzs_venue.pg_timezone )
-		ELSE DATE(to_timestamp(date_tz, 'YYYY-MM-DD"T"HH24:MI:SS') AT time zone tzs_country.pg_timezone) END AS date_match,
-	CASE WHEN (rounds.country_code='BR' OR rounds.country_code='MX') AND (matches.venue_id>0 AND tzs_venue.pg_timezone IS NOT NULL) 
-		THEN LEFT(RIGHT(TEXT(to_timestamp(date_tz, 'YYYY-MM-DD"T"HH24:MI:SS') AT time zone tzs_venue.pg_timezone), 8), 5) 
-		ELSE LEFT(RIGHT(TEXT(to_timestamp(date_tz, 'YYYY-MM-DD"T"HH24:MI:SS') AT time zone tzs_country.pg_timezone), 8), 5)	END AS time_match,
-	matches.venue_id,
+	fixture_referee,
+	fixture_date,
+	CASE WHEN (rounds.country_code='BR' OR rounds.country_code='MX') AND (matches.fixture_venue_id>0 AND tzs_venue.pg_timezone IS NOT NULL) 
+		THEN to_timestamp(fixture_date, 'YYYY-MM-DD"T"HH24:MI:SS') AT time zone tzs_venue.pg_timezone 
+		ELSE to_timestamp(fixture_date, 'YYYY-MM-DD"T"HH24:MI:SS') AT time zone tzs_country.pg_timezone	END AS date_timestamp,
+	CASE WHEN (rounds.country_code='BR' OR rounds.country_code='MX') AND (matches.fixture_venue_id>0 AND tzs_venue.pg_timezone IS NOT NULL) 
+		THEN DATE(to_timestamp(fixture_date, 'YYYY-MM-DD"T"HH24:MI:SS') AT time zone tzs_venue.pg_timezone )
+		ELSE DATE(to_timestamp(fixture_date, 'YYYY-MM-DD"T"HH24:MI:SS') AT time zone tzs_country.pg_timezone) END AS date_match,
+	CASE WHEN (rounds.country_code='BR' OR rounds.country_code='MX') AND (matches.fixture_venue_id>0 AND tzs_venue.pg_timezone IS NOT NULL) 
+		THEN LEFT(RIGHT(TEXT(to_timestamp(fixture_date, 'YYYY-MM-DD"T"HH24:MI:SS') AT time zone tzs_venue.pg_timezone), 8), 5) 
+		ELSE LEFT(RIGHT(TEXT(to_timestamp(fixture_date, 'YYYY-MM-DD"T"HH24:MI:SS') AT time zone tzs_country.pg_timezone), 8), 5) END AS time_match,
+	matches.fixture_venue_id,
 	teams_home_id,
 	teams_home_name,
 	teams_away_id,
@@ -34,10 +34,10 @@ SELECT
 		WHEN teams_home_winner=1 THEN 'Home'
 		WHEN teams_home_winner=-1 THEN 'Away'
 	ELSE 'Draw' END as target
-	
+
 FROM fdm.ft_api_matches AS matches
 LEFT JOIN fdm.lk_api_venues_tz as tzs_venue
-	ON matches.venue_id=tzs_venue.venue_id
+	ON matches.fixture_venue_id=tzs_venue.venue_id
 LEFT JOIN fdm.lk_csv_league_rounds AS rounds
 	ON matches.league_id=rounds.league_id AND matches.league_season=rounds.league_season AND matches.league_round=rounds.league_round
 LEFT JOIN fdm.lk_api_countries AS countries
