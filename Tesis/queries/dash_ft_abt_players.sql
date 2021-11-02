@@ -55,7 +55,7 @@ SELECT
 	player_positions.player_position AS player_preferred_position,
 	player_numbers.player_number AS player_preferred_number,
 	SUM(player_minutes) AS player_minutes,
-	SUM(player_rating*player_minutes)/NULLIF(SUM(CASE WHEN player_rating=0 THEN 0 ELSE player_minutes END), 0) wavg_player_rating,
+	SUM(player_rating*player_minutes)/NULLIF(SUM(CASE WHEN player_rating<=0 THEN 0 ELSE player_minutes END), 0) wavg_player_rating,
 	SUM(stats_players.offsides) AS offsides,
 	SUM(stats_players.shots_total) AS shots_total,
 	SUM(stats_players.shots_on) AS shots_on_goal,

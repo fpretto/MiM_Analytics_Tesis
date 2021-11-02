@@ -20,7 +20,7 @@ import numpy as np
 # DATA PREPARATION & FILTER
 ######################################################################
 
-def filter_and_data_engineering(df_ar, rating_correction):
+def filter_and_data_engineering(df_ar, rating_correction, correct_rating=False):
 
     # Filter players with at least 3 matches played
     df = df_ar[(df_ar['player_minutes'] >= 270) & (df_ar['player_id'] > 0)].copy()
@@ -75,17 +75,18 @@ def filter_and_data_engineering(df_ar, rating_correction):
     # Combined
     df['scoring_contribution'] = df['np_goals_p90']+df['assists_p90']
 
-    # Fill NAs rating with ratings from the same players in other seasons
-    df = df.merge(rating_correction, on=['player_id'], how='left')
-    df['wavg_player_rating'] = np.where(df['wavg_player_rating_x'].isna(), df['wavg_player_rating_y'], df['wavg_player_rating_x'])
-    del df['wavg_player_rating_x'], df['wavg_player_rating_y']
+    if correct_rating:
+        # Fill NAs rating with ratings from the same players in other seasons
+        df = df.merge(rating_correction, on=['player_id'], how='left')
+        df['wavg_player_rating'] = np.where(df['wavg_player_rating_x'].isna(), df['wavg_player_rating_y'], df['wavg_player_rating_x'])
+        del df['wavg_player_rating_x'], df['wavg_player_rating_y']
 
-    # Fill NAs rating with average rating of the position in the entire dataset
-    df_ratings_pos = df[['player_preferred_position', 'wavg_player_rating']].groupby(['player_preferred_position']).median().rename(
-        columns={'wavg_player_rating': 'wavg_position_rating'}).reset_index()
-    df = df.merge(df_ratings_pos, on=['player_preferred_position'], how='left')
-    df['wavg_player_rating'] = np.where(df['wavg_player_rating'].isna(), df['wavg_position_rating'], df['wavg_player_rating'])
-    del df['wavg_position_rating']
+        # Fill NAs rating with average rating of the position in the entire dataset
+        df_ratings_pos = df[['player_preferred_position', 'wavg_player_rating']].groupby(['player_preferred_position']).median().rename(
+            columns={'wavg_player_rating': 'wavg_position_rating'}).reset_index()
+        df = df.merge(df_ratings_pos, on=['player_preferred_position'], how='left')
+        df['wavg_player_rating'] = np.where(df['wavg_player_rating'].isna(), df['wavg_position_rating'], df['wavg_player_rating'])
+        del df['wavg_position_rating']
 
     # Unification of optimizing direction
     df['fouls_committed_p90'] = df['fouls_committed_p90']*-1
@@ -100,32 +101,36 @@ def normalize_by_position(df, dict_cols, scaler='Robust'):
 
     from sklearn.preprocessing import MinMaxScaler, RobustScaler, StandardScaler
 
-    dict_scalers = {"Robust": RobustScaler(), "Standard": StandardScaler(), "MinMax": MinMaxScaler()}
+    dict_scalers = {"Robust": RobustScaler, "Standard": StandardScaler, "MinMax": MinMaxScaler}
 
-    df_fw_0 = df[df['player_preferred_position'] == 'F'][dict_cols['player_cols'] + dict_cols['fw_cols']].copy()
-    df_mf_0 = df[df['player_preferred_position'] == 'M'][dict_cols['player_cols'] + dict_cols['mf_cols']].copy()
-    df_df_0 = df[df['player_preferred_position'] == 'D'][dict_cols['player_cols'] + dict_cols['df_cols']].copy()
-    df_gk_0 = df[df['player_preferred_position'] == 'G'][dict_cols['player_cols'] + dict_cols['gk_cols']].copy()
+    df_fw_0 = df[df['player_preferred_position'] == 'F'][dict_cols['player_cols'] + dict_cols['F']].copy()
+    df_mf_0 = df[df['player_preferred_position'] == 'M'][dict_cols['player_cols'] + dict_cols['M']].copy()
+    df_df_0 = df[df['player_preferred_position'] == 'D'][dict_cols['player_cols'] + dict_cols['D']].copy()
+    df_gk_0 = df[df['player_preferred_position'] == 'G'][dict_cols['player_cols'] + dict_cols['G']].copy()
 
-    scaler_fw = dict_scalers[scaler].fit(df_fw_0[dict_cols['fw_cols']])
+    scaler_fw = dict_scalers[scaler]()
+    scaler_fw = scaler_fw.fit(df_fw_0[dict_cols['F']])
     df_fw = pd.concat([df_fw_0[dict_cols['player_cols']].reset_index(drop=True),
-                       pd.DataFrame(scaler_fw.transform(df_fw_0[dict_cols['fw_cols']]),
-                                    columns=dict_cols['fw_cols'])], axis=1)
+                       pd.DataFrame(scaler_fw.transform(df_fw_0[dict_cols['F']]),
+                                    columns=dict_cols['F'])], axis=1)
 
-    scaler_mf = dict_scalers[scaler].fit(df_mf_0[dict_cols['mf_cols']])
+    scaler_mf = dict_scalers[scaler]()
+    scaler_mf = scaler_mf.fit(df_mf_0[dict_cols['M']])
     df_mf = pd.concat([df_mf_0[dict_cols['player_cols']].reset_index(drop=True),
-                       pd.DataFrame(scaler_mf.transform(df_mf_0[dict_cols['mf_cols']]),
-                                    columns=dict_cols['mf_cols'])], axis=1)
+                       pd.DataFrame(scaler_mf.transform(df_mf_0[dict_cols['M']]),
+                                    columns=dict_cols['M'])], axis=1)
 
-    scaler_df = dict_scalers[scaler].fit(df_df_0[dict_cols['df_cols']])
+    scaler_df = dict_scalers[scaler]()
+    scaler_df = scaler_df.fit(df_df_0[dict_cols['D']])
     df_df = pd.concat([df_df_0[dict_cols['player_cols']].reset_index(drop=True),
-                       pd.DataFrame(scaler_df.transform(df_df_0[dict_cols['df_cols']]),
-                                    columns=dict_cols['df_cols'])], axis=1)
+                       pd.DataFrame(scaler_df.transform(df_df_0[dict_cols['D']]),
+                                    columns=dict_cols['D'])], axis=1)
 
-    scaler_gk = dict_scalers[scaler].fit(df_gk_0[dict_cols['gk_cols']])
+    scaler_gk = dict_scalers[scaler]()
+    scaler_gk = scaler_gk.fit(df_gk_0[dict_cols['G']])
     df_gk = pd.concat([df_gk_0[dict_cols['player_cols']].reset_index(drop=True),
-                       pd.DataFrame(scaler_gk.transform(df_gk_0[dict_cols['gk_cols']]),
-                                    columns=dict_cols['gk_cols'])], axis=1)
+                       pd.DataFrame(scaler_gk.transform(df_gk_0[dict_cols['G']]),
+                                    columns=dict_cols['G'])], axis=1)
 
     dict_scalers = {'F': scaler_fw, 'M': scaler_mf, 'D': scaler_df, 'G': scaler_gk}
 

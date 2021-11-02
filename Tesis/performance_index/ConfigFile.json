@@ -2,4 +2,5 @@
   "data_sources": {
     "master_path":  "C:/Repo/MiM_Analytics_Tesis/Tesis/",
     "AR": "AR_20211019.csv",
-    "rating_correction": "rating_correction.csv"}}
+    "rating_correction": "rating_correction.csv",
+    "AR_score":  "AR_All_20211026.csv"}}

@@ -105,7 +105,36 @@ def create_index(df, cols, dict_weights, position, factors, factors_method='prin
         else:
             df_perf_idx['Perf_Index'] = np.sum(df_perf_idx[cols]*dict_weights_position[id_factor], axis=1)
 
-    df_perf_idx['Perf_Index_scaled'] = MinMaxScaler().fit_transform(pd.DataFrame(df_perf_idx['Perf_Index']))
+    scaler = MinMaxScaler()
+    scaler = scaler.fit(pd.DataFrame(df_perf_idx['Perf_Index']))
+    df_perf_idx['Perf_Index_scaled'] = scaler.transform(pd.DataFrame(df_perf_idx['Perf_Index']))
     dict_weights[position] = dict_weights_position
+    dict_weights["index_scaler"] = scaler
 
     return df_perf_idx, dict_weights
+
+def score_index(df, dict_perf_index):
+
+    df_indexes = pd.DataFrame()
+
+    for position in ['F', 'M', 'D', 'G']:
+
+        # Filter and Scale
+        df_index = df[df['player_preferred_position'] == position].reset_index(drop=True)
+        df_index = pd.DataFrame(dict_perf_index['scalers'][position].transform(df_index[dict_perf_index['cols'][position]]))
+        df_index.columns = dict_perf_index['cols'][position]
+
+        # Calculate Performance Index
+        for id_factor in dict_perf_index['index_weights'][position].keys():
+            if id_factor != 'Weights':
+                df_index[id_factor] = np.sum(df_index[dict_perf_index['cols'][position]]*dict_perf_index['index_weights'][position][id_factor], axis=1)
+            else:
+                df_index['Perf_Index'] = np.sum(df_index[dict_perf_index['cols'][position]]*dict_perf_index['index_weights'][position][id_factor], axis=1)
+
+        df_index['Perf_Index_scaled'] = dict_perf_index['index_weights']['index_scaler'].transform(pd.DataFrame(df_index['Perf_Index']))
+
+        # Append results
+        df_indexes = df_indexes.append(pd.concat([df[df['player_preferred_position']==position].reset_index(drop=True),
+                                                  df_index['Perf_Index_scaled']], axis=1)).reset_index(drop=True)
+
+    return df_indexes
