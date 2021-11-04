@@ -5,6 +5,7 @@ import dash_bootstrap_components as dbc
 import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
+import numpy as np
 import dash_table
 import json
 
@@ -12,7 +13,7 @@ app = dash.Dash(external_stylesheets=[dbc.themes.FLATLY])
 
 # Load data
 df = pd.read_csv('C:/Repo/MiM_Analytics_Tesis/Tesis/DASH_PlayersScored_20211101.csv', sep='|', decimal='.')
-config_data = json.load(open('config_dash.json'))
+config_data = json.load(open('C:/Repo/MiM_Analytics_Tesis/Tesis/dash_app/config_dash.json'))
 
 df['season'] = df['league_season'].astype(str) + '/' + df['league_season'].apply(lambda x: str(x+1)[2:4])
 df['Perf_Index_scaled'] = df['Perf_Index_scaled'].apply(lambda x: round(x*100))
@@ -22,10 +23,29 @@ player = 'Ignacio Scocco'
 df_player = df[df['player_name'] == player]
 
 current_season = 2020
-df_season = df_player[df_player['league_season'] == current_season][config_data["DashColumns"]["stats_season"]].transpose().reset_index()
-df_season.columns = ['Var', 'Value']
-df_season['Feature'] = df_season['Var'].map(config_data['ColumnNames'])
-df_season.loc[df_season['Feature'] == 'Posicion', 'Value'] = df_season.loc[df_season['Feature'] == 'Posicion', 'Value'].map(config_data["ColumnValues"]['player_preferred_position'])
+
+
+def create_table(df, phase, season):
+    df = df_player[df_player['league_season'] == season][config_data["DashColumns"][phase]].transpose().reset_index()
+    df.columns = ['Var', 'Value']
+    for col in df['Var'].to_list():
+        if col in config_data["PctVars"]:
+            df.loc[df['Var'] == col, 'Value'] = df.loc[df['Var'] == col, 'Value'].apply(lambda x: str(round(x*100))+'%')
+        elif col == 'player_preferred_position':
+            df.loc[df['Var'] == col, 'Value'] = df.loc[df['Var'] == col, 'Value'].map(config_data["ColumnValues"][col])
+        else:
+            df.loc[df['Var'] == col, 'Value'] = df.loc[df['Var'] == col, 'Value'].apply(lambda x: round(x*-1, 2) if x < 0 else round(x, 2))
+
+    df['Feature'] = df['Var'].map(config_data['ColumnNames'])
+
+    return df[['Feature', 'Value']]
+
+
+# Tables
+df_season = create_table(df, phase='stats_season', season=current_season)
+df_attack = create_table(df, phase='attack', season=current_season)
+df_buildup = create_table(df, phase='build_up', season=current_season)
+df_defense = create_table(df, phase='defense', season=current_season)
 
 # Plots Config
 dict_xaxis = dict(
@@ -97,34 +117,30 @@ def line_chart(df, var, layout):
     return fig
 
 # Table
+def table(df):
+    table = dash_table.DataTable(
+            data=df[['Feature', 'Value']].to_dict('records'),
+            columns=[{'id': c, 'name': c} for c in df[['Feature', 'Value']].columns],
+            fixed_rows={'headers': False},
+            style_table={'maxHeight': '500px'},
+            style_header={'display': 'none'},
+            style_data_conditional=[{
+                    'backgroundColor': 'rgb(30, 10, 130)',
+                    'color': 'white',
+                    'font-family': ['Verdana', 'sans-serif'], # https://www.w3.org/Style/Examples/007/fonts.en.html
+                    'fontSize': '16px'},
+                    {
+                    'if': {'column_id': 'Feature'},
+                    'textAlign': 'left'}],
+            style_cell={
+                    'textAlign': 'center',
+                    'border': '2px solid white',
+                    'maxWidth': '50px',
 
-table = dash_table.DataTable(
-        data=df_season[['Feature', 'Value']].to_dict('records'),
-        columns=[{'id': c, 'name': c} for c in df_season[['Feature', 'Value']].columns],
-        fixed_rows={'headers': False},
-        style_table={'maxHeight': '450px'},
-        style_header={'display': 'none'},
-        style_data_conditional=[
-                {'if': {'row_index': 'odd'},
-                 'backgroundColor': 'rgb(224,224,224)',
-                 'fontSize': '15px'
-                 },
-
-                {'if': {'row_index': 'even'},
-                 'backgroundColor': 'rgb(255,255,255)',
-                 'fontSize': '15px'
-                }
-        ],
-        style_cell={
-                'textAlign': 'center',
-                'border': '4px solid white',
-                'maxWidth': '50px',
-                # 'whiteSpace':'normal'
-                'textOverflow': 'ellipsis'
-        }
-
-
-)
+                    'textOverflow': 'ellipsis'},
+            style_as_list_view=True
+    )
+    return table
 
 # Navigation Bar
 PATH_logo = 'https://www.pinclipart.com/picdir/big/209-2095185_champions-league-logo-champions-league-football-logo-clipart.png'
@@ -142,12 +158,20 @@ app.layout = dbc.Container([
         dbc.Row([dbc.Col([html.H2(id='H2', children=f'{player} Statistics')], xl=12, lg=12, md=12, sm=12, xs=12)],
                 style={'textAlign': 'left', 'marginTop': 30, 'marginBottom': 30}),
         dbc.Row([
-                dbc.Col([html.Div(id='parent_div', children=[table])], xl=3, lg=3, md=3, sm=12, xs=12),
+                dbc.Col([html.Div(id='table_season', children=table(df_season))], xl=4, lg=4, md=4, sm=12, xs=12),
                 dbc.Col([dcc.Graph(id='bar_plot', figure=bar_chart(df_player, 'Perf_Index_scaled', dict_layout))],
                         xl=4, lg=4, md=4, sm=12, xs=12),
                 dbc.Col([dcc.Graph(id='line_plot', figure=line_chart(df_player, 'goals_total', dict_layout))],
-                        xl=4, lg=4, md=4, sm=12, xs=12)]
-        )
+                        xl=4, lg=4, md=4, sm=12, xs=12)]),
+        dbc.Row([dbc.Col([html.H4(id='title_attack', children='Ataque')], xl=4, lg=4, md=4, sm=12, xs=12)],
+                style={'textAlign': 'left', 'marginTop': 30, 'marginBottom': 30}),
+        dbc.Row([dbc.Col([html.Div(id='table_attack', children=table(df_attack))], xl=4, lg=4, md=4, sm=12, xs=12)]),
+        dbc.Row([dbc.Col([html.H4(id='title_buildup', children='Creación de juego y 1-vs-1')], xl=4, lg=4, md=4, sm=12, xs=12)],
+                style={'textAlign': 'left', 'marginTop': 30, 'marginBottom': 30}),
+        dbc.Row([dbc.Col([html.Div(id='table_buildup', children=table(df_buildup))], xl=4, lg=4, md=4, sm=12, xs=12)]),
+        dbc.Row([dbc.Col([html.H4(id='title_defense', children='Defensa y Disciplina')], xl=4, lg=4, md=4, sm=12, xs=12)],
+                style={'textAlign': 'left', 'marginTop': 30, 'marginBottom': 30}),
+        dbc.Row([dbc.Col([html.Div(id='table_defense', children=table(df_defense))], xl=4, lg=4, md=4, sm=12, xs=12)]),
 
 ], fluid=True)
 

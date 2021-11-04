@@ -20,9 +20,9 @@
         "wavg_player_rating": "Rating promedio",
         "goals_total": "Total Goles",
         "goals_assists": "Total Asistencias",
-        "scoring_contribution": "Participación directa en goles",
+        "scoring_contribution": "Participacion directa en goles",
         "goals_p90": "Goles P90",
-        "goal_conversion": "Efectividad de conversión",
+        "goal_conversion": "Efectividad de conversion",
         "shots_p90": "Tiros P90",
         "shooting_accuracy": "Efectividad en tiros",
         "assists_p90": "Asistencias P90",
@@ -40,6 +40,7 @@
         "fouls_committed_p90": "Fouls cometidos P90",
         "fouls_drawn_p90": "Fouls ganados P90",
         "cards_yellow": "Tarjetas amarillas",
-        "cards_red": "Tarjetas rojas"
-}
+        "cards_red": "Tarjetas rojas"},
+      "PctVars": ["shooting_accuracy", "goal_conversion", "passing_accuracy", "duels_success_ratio",
+            "dribbles_success_ratio"]
 }
