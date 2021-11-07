@@ -9,7 +9,7 @@ import numpy as np
 import dash_table
 import json
 
-app = dash.Dash(external_stylesheets=[dbc.themes.FLATLY])
+app = dash.Dash(external_stylesheets=[dbc.themes.CERULEAN])
 
 # Load data
 df = pd.read_csv('C:/Repo/MiM_Analytics_Tesis/Tesis/DASH_PlayersScored_20211101.csv', sep='|', decimal='.')
@@ -19,7 +19,7 @@ df['season'] = df['league_season'].astype(str) + '/' + df['league_season'].apply
 df['Perf_Index_scaled'] = df['Perf_Index_scaled'].apply(lambda x: round(x*100))
 df['wavg_player_rating'] = df['wavg_player_rating'].apply(lambda x: round(x, 2))
 
-player = 'Ignacio Scocco'
+player = 'Enzo Perez'
 df_player = df[df['player_name'] == player]
 
 current_season = 2020
@@ -40,12 +40,11 @@ def create_table(df, phase, season):
 
     return df[['Feature', 'Value']]
 
-
 # Tables
-df_season = create_table(df, phase='stats_season', season=current_season)
-df_attack = create_table(df, phase='attack', season=current_season)
-df_buildup = create_table(df, phase='build_up', season=current_season)
-df_defense = create_table(df, phase='defense', season=current_season)
+df_season = create_table(df_player, phase='stats_season', season=current_season)
+df_attack = create_table(df_player, phase='attack', season=current_season)
+df_buildup = create_table(df_player, phase='build_up', season=current_season)
+df_defense = create_table(df_player, phase='defense', season=current_season)
 
 # Plots Config
 dict_xaxis = dict(
@@ -107,7 +106,7 @@ def line_chart(df, var, dict_vars, layout):
             xaxis=layout['xaxis'],
             yaxis=layout['yaxis'],
             autosize=False,
-            width=500,
+            width=400,
             height=200,
             margin=layout['margins'],
             showlegend=False,
@@ -148,7 +147,7 @@ PATH_logo = 'https://www.pinclipart.com/picdir/big/209-2095185_champions-league-
 navbar = dbc.Navbar(id='navbar', children=[
         dbc.Row([
                 dbc.Col(html.Img(src=PATH_logo, height="60px")),
-                dbc.Col(dbc.NavbarBrand("App Title", style={'color': 'black', 'fontSize': '25px'}))],
+                dbc.Col(dbc.NavbarBrand("App Title", style={'color': 'white', 'font', 'fontSize': '25px'}))],
                 align="center"), # no_gutters elimina los espacios feos y alinea todo
         dbc.Button(id='button', children="Log in", color="primary", className='ml-auto')
         ], dark=True, color='dark')
