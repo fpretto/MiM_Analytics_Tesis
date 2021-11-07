@@ -87,7 +87,7 @@ def bar_chart(df, var, layout):
             xaxis=layout['xaxis'],
             yaxis=layout['yaxis'],
             autosize=False,
-            width=500,
+            width=1000,
             height=250,
             margin=layout['margins'],
             showlegend=False,
@@ -96,19 +96,19 @@ def bar_chart(df, var, layout):
 
     return fig
 
-def line_chart(df, var, layout):
+def line_chart(df, var, dict_vars, layout):
 
-    fig = go.Figure(data = [go.Scatter(x=df['season'], y=df[var],
-                                       line=dict(color='firebrick', width=3), fill='tozeroy',
-                                       text=df[var], textposition='top center')])
+    fig = go.Figure(data=[go.Scatter(x=df['season'], y=df[var],
+                                     line=dict(color='firebrick', width=3), fill='tozeroy',
+                                     text=df[var], textposition='top center')])
 
     fig.update_layout(
-            title='Total Goals',
+            title=dict_vars["ColumnNames"][var],
             xaxis=layout['xaxis'],
             yaxis=layout['yaxis'],
             autosize=False,
             width=500,
-            height=250,
+            height=200,
             margin=layout['margins'],
             showlegend=False,
             plot_bgcolor='white'
@@ -156,22 +156,59 @@ navbar = dbc.Navbar(id='navbar', children=[
 app.layout = dbc.Container([
         dbc.Row([dbc.Col([html.Div(id='parent', children=[navbar])], xl=12, lg=12, md=12, sm=12, xs=12)]),
         dbc.Row([dbc.Col([html.H2(id='H2', children=f'{player} Statistics')], xl=12, lg=12, md=12, sm=12, xs=12)],
-                style={'textAlign': 'left', 'marginTop': 30, 'marginBottom': 30}),
-        dbc.Row([
-                dbc.Col([html.Div(id='table_season', children=table(df_season))], xl=4, lg=4, md=4, sm=12, xs=12),
+                style={'textAlign': 'left', 'marginTop': 30, 'marginBottom': 5}),
+
+        # Season
+        dbc.Row([dbc.Col([html.Div(id='table_season', children=table(df_season))], xl=4, lg=4, md=4, sm=12, xs=12),
                 dbc.Col([dcc.Graph(id='bar_plot', figure=bar_chart(df_player, 'Perf_Index_scaled', dict_layout))],
-                        xl=4, lg=4, md=4, sm=12, xs=12),
-                dbc.Col([dcc.Graph(id='line_plot', figure=line_chart(df_player, 'goals_total', dict_layout))],
-                        xl=4, lg=4, md=4, sm=12, xs=12)]),
+                        xl=8, lg=8, md=8, sm=12, xs=12)]),
+        # Attack
         dbc.Row([dbc.Col([html.H4(id='title_attack', children='Ataque')], xl=4, lg=4, md=4, sm=12, xs=12)],
-                style={'textAlign': 'left', 'marginTop': 30, 'marginBottom': 30}),
-        dbc.Row([dbc.Col([html.Div(id='table_attack', children=table(df_attack))], xl=4, lg=4, md=4, sm=12, xs=12)]),
+                style={'textAlign': 'left', 'marginTop': 15, 'marginBottom': 5}),
+        dbc.Row([dbc.Col([html.Div(id='table_attack', children=table(df_attack))], xl=4, lg=4, md=4, sm=12, xs=12),
+                 dbc.Col([dbc.Row([
+                             dbc.Col([dcc.Graph(id='line_plot_goals', figure=line_chart(df_player, 'goals_p90', config_data, dict_layout))],
+                                     xl=4, lg=4, md=4, sm=12, xs=12),
+                             dbc.Col([dcc.Graph(id='line_plot_assists', figure=line_chart(df_player, 'assists_p90', config_data, dict_layout))],
+                                     xl=4, lg=4, md=4, sm=12, xs=12)]),
+
+                         dbc.Row([
+                             dbc.Col([dcc.Graph(id='line_plot_shots', figure=line_chart(df_player, 'shots_p90', config_data, dict_layout))],
+                                     xl=4, lg=4, md=4, sm=12, xs=12),
+                             dbc.Col([dcc.Graph(id='line_plot_shooting_acc', figure=line_chart(df_player, 'shooting_accuracy', config_data, dict_layout))],
+                                     xl=4, lg=4, md=4, sm=12, xs=12)])])]),
+
+        # Build-up
         dbc.Row([dbc.Col([html.H4(id='title_buildup', children='Creación de juego y 1-vs-1')], xl=4, lg=4, md=4, sm=12, xs=12)],
-                style={'textAlign': 'left', 'marginTop': 30, 'marginBottom': 30}),
-        dbc.Row([dbc.Col([html.Div(id='table_buildup', children=table(df_buildup))], xl=4, lg=4, md=4, sm=12, xs=12)]),
+                style={'textAlign': 'left', 'marginTop': 15, 'marginBottom': 5}),
+        dbc.Row([dbc.Col([html.Div(id='table_buildup', children=table(df_buildup))], xl=4, lg=4, md=4, sm=12, xs=12),
+                 dbc.Col([dbc.Row([
+                         dbc.Col([dcc.Graph(id='line_plot_passes', figure=line_chart(df_player, 'passes_p90', config_data, dict_layout))],
+                                 xl=4, lg=4, md=4, sm=12, xs=12),
+                         dbc.Col([dcc.Graph(id='line_plot_passing_acc', figure=line_chart(df_player, 'passing_accuracy', config_data, dict_layout))],
+                                 xl=4, lg=4, md=4, sm=12, xs=12)]),
+
+                         dbc.Row([
+                                 dbc.Col([dcc.Graph(id='line_plot_dribbles', figure=line_chart(df_player, 'dribbles_p90', config_data, dict_layout))],
+                                         xl=4, lg=4, md=4, sm=12, xs=12),
+                                 dbc.Col([dcc.Graph(id='line_plot_duels', figure=line_chart(df_player, 'duels_p90', config_data, dict_layout))],
+                                         xl=4, lg=4, md=4, sm=12, xs=12)])])]),
+
+        # Defense
         dbc.Row([dbc.Col([html.H4(id='title_defense', children='Defensa y Disciplina')], xl=4, lg=4, md=4, sm=12, xs=12)],
-                style={'textAlign': 'left', 'marginTop': 30, 'marginBottom': 30}),
-        dbc.Row([dbc.Col([html.Div(id='table_defense', children=table(df_defense))], xl=4, lg=4, md=4, sm=12, xs=12)]),
+                style={'textAlign': 'left', 'marginTop': 15, 'marginBottom': 5}),
+        dbc.Row([dbc.Col([html.Div(id='table_defense', children=table(df_defense))], xl=4, lg=4, md=4, sm=12, xs=12),
+                 dbc.Col([dbc.Row([
+                         dbc.Col([dcc.Graph(id='line_plot_saves', figure=line_chart(df_player, 'saves_p90', config_data, dict_layout))],
+                                 xl=4, lg=4, md=4, sm=12, xs=12),
+                         dbc.Col([dcc.Graph(id='line_plot_tackles', figure=line_chart(df_player, 'tackles_p90', config_data, dict_layout))],
+                                 xl=4, lg=4, md=4, sm=12, xs=12)]),
+
+                         dbc.Row([
+                                 dbc.Col([dcc.Graph(id='line_plot_interceptions', figure=line_chart(df_player, 'interceptions_p90', config_data, dict_layout))],
+                                         xl=4, lg=4, md=4, sm=12, xs=12),
+                                 dbc.Col([dcc.Graph(id='line_plot_blocks', figure=line_chart(df_player, 'blocks_p90', config_data, dict_layout))],
+                                         xl=4, lg=4, md=4, sm=12, xs=12)])])]),
 
 ], fluid=True)
 

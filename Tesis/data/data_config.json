@@ -8,7 +8,7 @@
 			"leagues": {"process": "False"},
 			"teams": {"process": "False", "params": {"country": ["Spain",  "France",  "Italy",  "Belgium", "Netherlands",  "England",  "Germany",  "Portugal"], "league": [], "season": [2016,2017,2018,2019,2020]}},
 			"matches": {"process": "False", "params": {"league": [94,88,135,61,140,78,39,144], "season": [2016,2017,2018,2019,2020]}},
-			"matches_events": {"process": "True", "params": {"league": [78], "season": [2017,2018,2019,2020], "fixture_id": []}},
+			"matches_events": {"process": "True", "params": {"league": [94,88,135,61,140,78,39,144], "season": [2016], "fixture_id": []}},
 			"predictions": {"process":  "False", "params": {"league": [128], "season": [2016,2017,2018,2019,2020], "fixture_id": []}},
 			"standings": {"process":  "False", "params": {"league": [128], "season": [2016,2017,2018,2019,2020]}},
 			"transfers": {"process":  "False", "params": {"league": [128, 71, 239, 242, 250, 262, 265, 268, 281]}},
