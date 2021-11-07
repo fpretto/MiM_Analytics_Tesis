@@ -9,7 +9,7 @@ import numpy as np
 import dash_table
 import json
 
-app = dash.Dash(external_stylesheets=[dbc.themes.CERULEAN])
+app = dash.Dash(external_stylesheets=[dbc.themes.YETI])
 
 # Load data
 df = pd.read_csv('C:/Repo/MiM_Analytics_Tesis/Tesis/DASH_PlayersScored_20211101.csv', sep='|', decimal='.')
@@ -124,31 +124,38 @@ def table(df):
             style_table={'maxHeight': '500px'},
             style_header={'display': 'none'},
             style_data_conditional=[{
-                    'backgroundColor': 'rgb(30, 10, 130)',
+                    'backgroundColor': '#008cba',
                     'color': 'white',
-                    'font-family': ['Verdana', 'sans-serif'], # https://www.w3.org/Style/Examples/007/fonts.en.html
+                    'font-family': ['Roboto', 'sans-serif'],
                     'fontSize': '16px'},
-                    {
-                    'if': {'column_id': 'Feature'},
-                    'textAlign': 'left'}],
+                    {'if': {'column_id': 'Feature'}, 'textAlign': 'left'}],
             style_cell={
                     'textAlign': 'center',
                     'border': '2px solid white',
                     'maxWidth': '50px',
-
                     'textOverflow': 'ellipsis'},
             style_as_list_view=True
     )
+
+    # table = dbc.Table.from_dataframe(df[['Feature', 'Value']], striped=False, borderless=True, responsive=True,
+    #                                  className="table-primary", size='md', style={"style_header": False})
+
     return table
 
 # Navigation Bar
-PATH_logo = 'https://www.pinclipart.com/picdir/big/209-2095185_champions-league-logo-champions-league-football-logo-clipart.png'
+PATH_logo = 'https://cdn.imgbin.com/0/5/11/imgbin-logo-football-photography-football-white-and-black-soccer-ball-Gyz1CSJpkP6NGb7GmuJuSDt2a.jpg'
 
 navbar = dbc.Navbar(id='navbar', children=[
         dbc.Row([
                 dbc.Col(html.Img(src=PATH_logo, height="60px")),
-                dbc.Col(dbc.NavbarBrand("App Title", style={'color': 'white', 'font', 'fontSize': '25px'}))],
+                dbc.Col(dbc.NavbarBrand("Football Analytics App", style={'color': 'white', 'fontSize': '20px'}))],
                 align="center"), # no_gutters elimina los espacios feos y alinea todo
+        dbc.Col([], xl=5, lg=5, md=5, sm=5, xs=5),
+        dbc.Nav([dbc.NavLink('Home', href='/apps/home', active=True),
+                 dbc.NavLink('Equipos', href='/apps/equipos'),
+                 dbc.NavLink('Jugador', href='/apps/jugador'),
+                 dbc.NavLink('Comparativa', href='/apps/comparativa')],
+                style={"fontSize": "17px"}),
         dbc.Button(id='button', children="Log in", color="primary", className='ml-auto')
         ], dark=True, color='dark')
 
