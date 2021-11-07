@@ -15,6 +15,32 @@ app = dash.Dash(external_stylesheets=[dbc.themes.YETI])
 df = pd.read_csv('C:/Repo/MiM_Analytics_Tesis/Tesis/DASH_PlayersScored_20211101.csv', sep='|', decimal='.')
 config_data = json.load(open('C:/Repo/MiM_Analytics_Tesis/Tesis/dash_app/config_dash.json'))
 
+df.columns
+
+dict_options = {}
+
+for country in df['team_country'].unique():
+    dict_options[country] = {}
+    for league in df['league_name'].unique():
+        dict_options[country][league] = {}
+        for season in df['league_season'].unique():
+            dict_options[country][league][str(season)] = {}
+            for team in df[df['league_name'] == league]['team_name']:
+                dict_options[country][league][season][team] = df[(df['league_name'] == league) & (df['league_season'] == season) & (df['team_name'] == team)]['player_name'].unique()
+
+with open('C:/Repo/MiM_Analytics_Tesis/Tesis/dash_app/data/dropdown_options.json', 'w') as file:
+    json.dump(dict_options, file)
+
+dict_options["Argentina"]["Primera Division"][2020]["Boca Juniors"]
+team_name = df['team_name'].unique()
+player_name = df['player_name'].unique()
+
+dict_options.keys() = ['a', 'b']
+
+dict_options['a'] = 1564
+
+dict_options['b']['sd'] = '123'
+
 df['season'] = df['league_season'].astype(str) + '/' + df['league_season'].apply(lambda x: str(x+1)[2:4])
 df['Perf_Index_scaled'] = df['Perf_Index_scaled'].apply(lambda x: round(x*100))
 df['wavg_player_rating'] = df['wavg_player_rating'].apply(lambda x: round(x, 2))
