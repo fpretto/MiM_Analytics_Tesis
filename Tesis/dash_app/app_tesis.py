@@ -2,12 +2,14 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
+from dash.dependencies import Input, Output
 import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
 import numpy as np
 import dash_table
 import json
+import joblib
 
 app = dash.Dash(external_stylesheets=[dbc.themes.YETI])
 
@@ -15,31 +17,23 @@ app = dash.Dash(external_stylesheets=[dbc.themes.YETI])
 df = pd.read_csv('C:/Repo/MiM_Analytics_Tesis/Tesis/DASH_PlayersScored_20211101.csv', sep='|', decimal='.')
 config_data = json.load(open('C:/Repo/MiM_Analytics_Tesis/Tesis/dash_app/config_dash.json'))
 
-df.columns
+# dict_options = {}
+#
+# for country in df['team_country'].unique():
+#     print('Pais: ', country)
+#     dict_options[country] = {}
+#     for league in df[df['team_country'] == country]['league_name'].unique():
+#         print('Liga: ', league)
+#         dict_options[country][league] = {}
+#         for season in df[(df['team_country'] == country) & (df['league_name'] == league)]['league_season'].unique():
+#             print('Temporada: ', season)
+#             dict_options[country][league][str(season)] = {}
+#             for team in df[(df['team_country'] == country) & (df['league_name'] == league) & (df['league_season'] == season)]['team_name']:
+#                 dict_options[country][league][str(season)][team] = df[(df['league_name'] == league) & (df['league_season'] == season) & (df['team_name'] == team)]['player_name'].unique()
+#
+# joblib.dump(dict_options, 'C:/Repo/MiM_Analytics_Tesis/Tesis/dash_app/data/dropdown_options.pkl')
 
-dict_options = {}
-
-for country in df['team_country'].unique():
-    dict_options[country] = {}
-    for league in df['league_name'].unique():
-        dict_options[country][league] = {}
-        for season in df['league_season'].unique():
-            dict_options[country][league][str(season)] = {}
-            for team in df[df['league_name'] == league]['team_name']:
-                dict_options[country][league][season][team] = df[(df['league_name'] == league) & (df['league_season'] == season) & (df['team_name'] == team)]['player_name'].unique()
-
-with open('C:/Repo/MiM_Analytics_Tesis/Tesis/dash_app/data/dropdown_options.json', 'w') as file:
-    json.dump(dict_options, file)
-
-dict_options["Argentina"]["Primera Division"][2020]["Boca Juniors"]
-team_name = df['team_name'].unique()
-player_name = df['player_name'].unique()
-
-dict_options.keys() = ['a', 'b']
-
-dict_options['a'] = 1564
-
-dict_options['b']['sd'] = '123'
+dict_options = joblib.load('C:/Repo/MiM_Analytics_Tesis/Tesis/dash_app/data/dropdown_options.pkl')
 
 df['season'] = df['league_season'].astype(str) + '/' + df['league_season'].apply(lambda x: str(x+1)[2:4])
 df['Perf_Index_scaled'] = df['Perf_Index_scaled'].apply(lambda x: round(x*100))
@@ -49,22 +43,24 @@ player = 'Enzo Perez'
 df_player = df[df['player_name'] == player]
 
 current_season = 2020
+df_player.columns
+df_player[['passes_p90', 'passes_total', 'passes_completed', 'passing_accuracy']]
 
 
 def create_table(df, phase, season):
-    df = df_player[df_player['league_season'] == season][config_data["DashColumns"][phase]].transpose().reset_index()
-    df.columns = ['Var', 'Value']
-    for col in df['Var'].to_list():
+    df_filtered = df[df['league_season'] == season][config_data["DashColumns"][phase]].transpose().reset_index()
+    df_filtered.columns = ['Var', 'Value']
+    for col in df_filtered['Var'].to_list():
         if col in config_data["PctVars"]:
-            df.loc[df['Var'] == col, 'Value'] = df.loc[df['Var'] == col, 'Value'].apply(lambda x: str(round(x*100))+'%')
+            df_filtered.loc[df_filtered['Var'] == col, 'Value'] = df_filtered.loc[df_filtered['Var'] == col, 'Value'].apply(lambda x: str(round(x*100))+'%')
         elif col == 'player_preferred_position':
-            df.loc[df['Var'] == col, 'Value'] = df.loc[df['Var'] == col, 'Value'].map(config_data["ColumnValues"][col])
+            df_filtered.loc[df_filtered['Var'] == col, 'Value'] = df_filtered.loc[df_filtered['Var'] == col, 'Value'].map(config_data["ColumnValues"][col])
         else:
-            df.loc[df['Var'] == col, 'Value'] = df.loc[df['Var'] == col, 'Value'].apply(lambda x: round(x*-1, 2) if x < 0 else round(x, 2))
+            df_filtered.loc[df_filtered['Var'] == col, 'Value'] = df_filtered.loc[df_filtered['Var'] == col, 'Value'].apply(lambda x: round(x*-1, 2) if x < 0 else round(x, 2))
 
-    df['Feature'] = df['Var'].map(config_data['ColumnNames'])
+    df_filtered['Feature'] = df_filtered['Var'].map(config_data['ColumnNames'])
 
-    return df[['Feature', 'Value']]
+    return df_filtered[['Feature', 'Value']]
 
 # Tables
 df_season = create_table(df_player, phase='stats_season', season=current_season)
@@ -187,12 +183,18 @@ navbar = dbc.Navbar(id='navbar', children=[
 
 app.layout = dbc.Container([
         dbc.Row([dbc.Col([html.Div(id='parent', children=[navbar])], xl=12, lg=12, md=12, sm=12, xs=12)]),
+        html.Br(),
+        dbc.Row([dbc.Col(dcc.Dropdown(id='country-dropdown', placeholder='Seleccione un pais', options=[{'label': i, 'value': i} for i in dict_options.keys()], value='Argentina')),
+                 dbc.Col(dcc.Dropdown(id='league-dropdown', placeholder='Seleccione una liga')),
+                 dbc.Col(dcc.Dropdown(id='season-dropdown', placeholder='Seleccione una temporada')),
+                 dbc.Col(dcc.Dropdown(id='team-dropdown', placeholder='Seleccione un equipo')),
+                 dbc.Col(dcc.Dropdown(id='player-dropdown', placeholder='Seleccione un jugador'))]),
         dbc.Row([dbc.Col([html.H2(id='H2', children=f'{player} Statistics')], xl=12, lg=12, md=12, sm=12, xs=12)],
                 style={'textAlign': 'left', 'marginTop': 30, 'marginBottom': 5}),
 
         # Season
         dbc.Row([dbc.Col([html.Div(id='table_season', children=table(df_season))], xl=4, lg=4, md=4, sm=12, xs=12),
-                dbc.Col([dcc.Graph(id='bar_plot', figure=bar_chart(df_player, 'Perf_Index_scaled', dict_layout))],
+                dbc.Col([dcc.Graph(id='bar_plot_index', figure=bar_chart(df_player, 'Perf_Index_scaled', dict_layout))],
                         xl=8, lg=8, md=8, sm=12, xs=12)]),
         # Attack
         dbc.Row([dbc.Col([html.H4(id='title_attack', children='Ataque')], xl=4, lg=4, md=4, sm=12, xs=12)],
@@ -243,6 +245,110 @@ app.layout = dbc.Container([
                                          xl=4, lg=4, md=4, sm=12, xs=12)])])]),
 
 ], fluid=True)
+
+
+@app.callback(Output('league-dropdown', 'options'),
+              [Input('country-dropdown', 'value')])
+def set_league_options(selected_country):
+    return [{'label': i, 'value': i} for i in dict_options['{}'.format(selected_country)].keys()]
+
+@app.callback(Output('league-dropdown', 'value'),
+              [Input('league-dropdown', 'options')])
+def set_league_value(leagues_options):
+    return sorted(leagues_options)[0]['value']
+
+@app.callback(Output('season-dropdown', 'options'),
+              [Input('league-dropdown', 'value'),
+               Input('country-dropdown', 'value')])
+def set_season_options(selected_league, selected_country):
+    return [{'label': i, 'value': i} for i in dict_options['{}'.format(selected_country)]['{}'.format(selected_league)].keys()]
+
+@app.callback(Output('season-dropdown', 'value'),
+              [Input('season-dropdown', 'options')])
+def set_season_value(season_options):
+    return sorted(season_options)[0]['value']
+
+@app.callback(Output('team-dropdown', 'options'),
+              [Input('season-dropdown', 'value'),
+               Input('league-dropdown', 'value'),
+               Input('country-dropdown', 'value')])
+def set_team_options(selected_season, selected_league, selected_country):
+    return [{'label': i, 'value': i} for i in dict_options['{}'.format(selected_country)]['{}'.format(selected_league)]['{}'.format(selected_season)].keys()]
+
+@app.callback(Output('team-dropdown', 'value'),
+              [Input('team-dropdown', 'options')])
+def set_team_value(team_options):
+    return sorted(team_options)[0]['value']
+
+@app.callback(Output('player-dropdown', 'options'),
+              [Input('team-dropdown', 'value'),
+               Input('season-dropdown', 'value'),
+               Input('league-dropdown', 'value'),
+               Input('country-dropdown', 'value')])
+def set_players_options(selected_team, selected_season, selected_league, selected_country):
+    return [{'label': i, 'value': i} for i in dict_options['{}'.format(selected_country)]['{}'.format(selected_league)]['{}'.format(selected_season)]['{}'.format(selected_team)]]
+
+@app.callback(Output('player-dropdown', 'value'),
+              [Input('player-dropdown', 'options')])
+def set_players_value(player_options):
+    return sorted(player_options)[0]['value']
+
+@app.callback([Output(component_id='table_season', component_property='children'),
+               Output(component_id='table_attack', component_property='children'),
+               Output(component_id='table_buildup', component_property='children'),
+               Output(component_id='table_defense', component_property='children'),
+               Output(component_id='bar_plot_index', component_property='figure'),
+               Output(component_id='line_plot_goals', component_property='figure'),
+               Output(component_id='line_plot_assists', component_property='figure'),
+               Output(component_id='line_plot_shots', component_property='figure'),
+               Output(component_id='line_plot_shooting_acc', component_property='figure'),
+               Output(component_id='line_plot_passes', component_property='figure'),
+               Output(component_id='line_plot_passing_acc', component_property='figure'),
+               Output(component_id='line_plot_dribbles', component_property='figure'),
+               Output(component_id='line_plot_duels', component_property='figure'),
+               Output(component_id='line_plot_saves', component_property='figure'),
+               Output(component_id='line_plot_tackles', component_property='figure'),
+               Output(component_id='line_plot_interceptions', component_property='figure'),
+               Output(component_id='line_plot_blocks', component_property='figure')],
+              Input('player-dropdown', 'value'))
+def update_player_data(player_dropdown_value):
+
+    if player_dropdown_value != None:
+        df_player = df.loc[(df['player_name'] == player_dropdown_value), :]
+
+    # Tables
+    df_season = create_table(df_player, phase='stats_season', season=2020)
+    df_attack = create_table(df_player, phase='attack', season=2020)
+    df_buildup = create_table(df_player, phase='build_up', season=2020)
+    df_defense = create_table(df_player, phase='defense', season=2020)
+    table_season = table(df_season)
+    table_attack = table(df_attack)
+    table_buildup = table(df_buildup)
+    table_defense = table(df_defense)
+    # Plots
+    fig_index = bar_chart(df_player, 'Perf_Index_scaled', dict_layout)
+    fig_goals = line_chart(df_player, 'goals_p90', config_data, dict_layout)
+    fig_assists = line_chart(df_player, 'assists_p90', config_data, dict_layout)
+    fig_shots = line_chart(df_player, 'shots_p90', config_data, dict_layout)
+    fig_shooting_acc = line_chart(df_player, 'shooting_accuracy', config_data, dict_layout)
+    fig_passes = line_chart(df_player, 'passes_p90', config_data, dict_layout)
+    fig_passing_acc = line_chart(df_player, 'passing_accuracy', config_data, dict_layout)
+    fig_dribbles = line_chart(df_player, 'dribbles_p90', config_data, dict_layout)
+    fig_duels = line_chart(df_player, 'duels_p90', config_data, dict_layout)
+    fig_saves = line_chart(df_player, 'saves_p90', config_data, dict_layout)
+    fig_tackles = line_chart(df_player, 'tackles_p90', config_data, dict_layout)
+    fig_interceptions = line_chart(df_player, 'interceptions_p90', config_data, dict_layout)
+    fig_blocks = line_chart(df_player, 'blocks_p90', config_data, dict_layout)
+
+    return table_season, table_attack, table_buildup, table_defense, \
+           fig_index, fig_goals, fig_assists, fig_shots, fig_shooting_acc, fig_passes, fig_passing_acc, fig_dribbles, \
+           fig_duels, fig_saves, fig_tackles, fig_interceptions, fig_blocks
+
+# selected_country='Argentina'
+# selected_league='Primera Division'
+# selected_season='2016'
+# selected_team='Boca Juniors'
+
 
 if __name__ == '__main__':
     app.run_server()
