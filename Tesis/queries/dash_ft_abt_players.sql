@@ -1,6 +1,6 @@
 -- Player Preferred Number
-DROP TABLE IF EXISTS fdm.dash_lk_player_number_all_seasons;
-CREATE TABLE fdm.dash_lk_player_number_all_seasons AS (
+DROP TABLE IF EXISTS fdm.dash_lk_player_number;
+CREATE TABLE fdm.dash_lk_player_number AS (
 WITH 
 grouped_players_number AS(
 	SELECT 
@@ -11,6 +11,8 @@ grouped_players_number AS(
 	FROM fdm.ft_api_matches_stats_players AS stats_players
 	LEFT JOIN fdm.ft_api_matches AS matches
 		ON stats_players.fixture_id=matches.fixture_id
+	LEFT JOIN fdm.lk_api_leagues AS leagues
+		ON matches.league_id=leagues.league_id
 	GROUP BY player_id, player_number
 	ORDER BY player_id, matches DESC
 ),
@@ -23,8 +25,8 @@ SELECT * FROM grouped_players_number2
 WHERE row_n=1);
 
 -- Player Preferred Position
-DROP TABLE IF EXISTS fdm.dash_lk_player_position_all_seasons;
-CREATE TABLE fdm.dash_lk_player_position_all_seasons AS (
+DROP TABLE IF EXISTS fdm.dash_lk_player_position;
+CREATE TABLE fdm.dash_lk_player_position AS (
 WITH
 grouped_players_position AS(
 	SELECT 
@@ -35,6 +37,8 @@ grouped_players_position AS(
 	FROM fdm.ft_api_matches_stats_players AS stats_players
 	LEFT JOIN fdm.ft_api_matches AS matches
 		ON stats_players.fixture_id=matches.fixture_id
+	LEFT JOIN fdm.lk_api_leagues AS leagues
+		ON matches.league_id=leagues.league_id
 	GROUP BY player_id, player_position
 	ORDER BY player_id, matches DESC
 ),
@@ -47,15 +51,15 @@ SELECT * FROM grouped_players_position2
 WHERE row_n=1);
 
 -- ABT
-DROP TABLE IF EXISTS fdm.dash_ft_abt_all_seasons;
-CREATE TABLE fdm.dash_ft_abt_all_seasons AS (
+DROP TABLE IF EXISTS fdm.dash_ft_abt_players;
+CREATE TABLE fdm.dash_ft_abt_players AS (
 SELECT
 	stats_players.player_id,
 	player_names.player_name,
 	player_positions.player_position AS player_preferred_position,
 	player_numbers.player_number AS player_preferred_number,
 	SUM(player_minutes) AS player_minutes,
-	SUM(player_rating*player_minutes)/NULLIF(SUM(CASE WHEN player_rating<=0 THEN 0 ELSE player_minutes END), 0) wavg_player_rating,
+	SUM(player_rating*player_minutes)/NULLIF(SUM(CASE WHEN player_rating<1 THEN 0 ELSE player_minutes END), 0) wavg_player_rating,
 	SUM(stats_players.offsides) AS offsides,
 	SUM(stats_players.shots_total) AS shots_total,
 	SUM(stats_players.shots_on) AS shots_on_goal,
@@ -91,17 +95,37 @@ SELECT
 	
 
 FROM fdm.ft_api_matches_stats_players AS stats_players
-LEFT JOIN fdm.ft_api_matches AS matches
-	ON stats_players.fixture_id=matches.fixture_id
-INNER JOIN fdm.dash_lk_leagues AS dash_leagues
-	ON matches.league_id=dash_leagues.league_id AND matches.league_season=dash_leagues.league_season
 LEFT JOIN fdm.fp_lk_player_names as player_names
 	ON stats_players.player_id=player_names.player_id
-LEFT JOIN fdm.dash_lk_player_position_all_seasons AS player_positions
+LEFT JOIN fdm.ft_api_matches AS matches
+	ON stats_players.fixture_id=matches.fixture_id
+LEFT JOIN fdm.dash_lk_player_position AS player_positions
 	ON stats_players.player_id=player_positions.player_id
-LEFT JOIN fdm.dash_lk_player_number_all_seasons AS player_numbers
+LEFT JOIN fdm.dash_lk_player_number AS player_numbers
 	ON stats_players.player_id=player_numbers.player_id
 LEFT JOIN fdm.ft_api_matches_stats_teams AS stats_teams
 	ON stats_players.fixture_id=stats_teams.fixture_id AND stats_players.team_id=stats_teams.teams_id
-GROUP BY stats_players.player_id, player_names.player_name, player_positions.player_position, player_numbers.player_number
+INNER JOIN fdm.dash_lk_leagues AS dash_leagues
+	ON matches.league_id=dash_leagues.league_id AND matches.league_season=dash_leagues.league_season
+GROUP BY stats_players.player_id, player_names.player_name, 
+	player_positions.player_position, player_numbers.player_number
 );
+
+DROP TABLE fdm.dash_lk_player_position;
+DROP TABLE fdm.dash_lk_player_number;
+
+/*
+SELECT count(*) FROM fdm.ft_api_matches_stats_teams
+where ball_possesion <= 0
+
+SELECT players.*,
+	tackles_total,
+	CASE WHEN teams.ball_possesion=0 THEN tackles_total ELSE tackles_total*0.5/teams.ball_possesion END AS tackles_total_padj,
+	tackles_blocks,
+	CASE WHEN teams.ball_possesion=0 THEN tackles_blocks ELSE tackles_blocks*0.5/teams.ball_possesion END AS tackles_blocks_padj,
+	tackles_interceptions,
+	CASE WHEN teams.ball_possesion=0 THEN tackles_interceptions ELSE tackles_interceptions*0.5/teams.ball_possesion END AS tackles_interceptions_padj,
+	teams.ball_possesion FROM fdm.ft_api_matches_stats_players AS players
+LEFT JOIN fdm.ft_api_matches_stats_teams AS teams
+	ON players.fixture_id=teams.fixture_id AND players.team_id=teams.team_id
+*/

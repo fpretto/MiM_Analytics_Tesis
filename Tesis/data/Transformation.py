@@ -369,8 +369,8 @@ class Transformation:
             df_transfers = pd.DataFrame()
             for idx in range(len(self.data['response'])):
                 transfer = pd.json_normalize(self.data['response'][idx]['transfers'], sep='_')
-                transfer.loc[:, 'player_id'] = pd.json_normalize(self.data['response'][idx], sep='_')['player_id'].values
-                transfer.loc[:, 'player_name'] = pd.json_normalize(self.data['response'][idx], sep='_')['player_name'].values
+                transfer.loc[:, 'player_id'] = self.data['response'][idx]['player']['id']
+                transfer.loc[:, 'player_name'] = self.data['response'][idx]['player']['name']
 
                 df_transfers = df_transfers.append(transfer).reset_index(drop=True)
 

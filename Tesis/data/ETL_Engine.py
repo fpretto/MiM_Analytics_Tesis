@@ -314,8 +314,6 @@ class ETL_Engine:
 
 
 
-
 if __name__ == '__main__':
-
     etl_data = json.load(open('data_config.json'))
     ETL_Engine(etl_data)
