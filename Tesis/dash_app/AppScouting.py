@@ -38,25 +38,27 @@ def table(df):
     table = dash_table.DataTable(
             data=df_table.to_dict('records'),
             columns=[{'id': c, 'name': c} for c in df_table.columns],
-            fixed_rows={'headers': False},
-            style_table={'maxHeight': '500px', 'borderRadius': '15px'},
+            fixed_rows={'headers': True},
+            style_table={'maxHeight': '750px', 'borderRadius': '20px', 'overflowY': 'scroll'},
             style_header={
                     'backgroundColor': '#192280',
                     'textAlign': 'center',
                     'color': 'white',
                     'font-family': ['Roboto', 'sans-serif'],
                     'border': '2px solid white',
+                    'width': '50px',
                     'fontSize': '14px',
                     'textOverflow': 'ellipsis'},
             style_data_conditional=[{
                     'backgroundColor': 'white',
                     'color': '#1e2794',
                     'border': '0.5px solid blue',
+                    'width': '50px',
                     'font-family': ['Roboto', 'sans-serif'],
                     'fontSize': '12px',
                     'textOverflow': 'ellipsis',
                     'textAlign': 'center'}],
-            style_as_list_view=True
+            style_as_list_view=True, page_size=75
     )
 
     # table = dbc.Table.from_dataframe(df[['Feature', 'Value']], striped=False, borderless=True, responsive=True,
@@ -95,6 +97,7 @@ app.layout = dbc.Container([
                  html.H6(id='measure_posicion', children='Posicion'),
                  dcc.Dropdown(id='dropdown_posicion', placeholder='Todas las posiciones', options=[{'label': i, 'value': i} for i in sorted(df_players['player_preferred_position'].unique())]),
                  html.Br(),
+                 html.H4(id='title_general', children='General'),
                  html.H6(id='measure_appearances', children='Apariciones'),
                  dcc.RangeSlider(id='slider_appearances', min=0, max=60, value=[0, 60], tooltip={"placement": "bottom", "always_visible": True}),
                  html.Br(),
@@ -122,10 +125,10 @@ app.layout = dbc.Container([
                  html.H4(id='title_attack', children='Attacking'),
                  html.H6(id='measure_shots_p90', children='Shots P90'),
                  dcc.RangeSlider(id='slider_shots_p90', min=0, max=100, value=[0, 100], tooltip={"placement": "bottom", "always_visible": True})],
-                xl=3, lg=3, md=3, sm=12, xs=12),
+                xl=2, lg=2, md=2, sm=12, xs=12),
                 dbc.Col([], xl=1, lg=1, md=1, sm=12, xs=12),
                 dbc.Col([html.Div(id='table_season', children=table(df_players))],
-                        xl=8, lg=8, md=8, sm=12, xs=12)]),
+                        xl=9, lg=9, md=9, sm=12, xs=12)]),
 ], fluid=True)
 @app.callback(Output('table_season', 'children'),
               [Input('dropdown_liga', 'value'),
