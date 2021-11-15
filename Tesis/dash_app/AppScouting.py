@@ -24,8 +24,9 @@ df_season_players = preprocessing.load_score_process_data(dataset='player_season
 df_players = preprocessing.load_score_process_data(dataset='player_all_seasons')
 dropdown_options = joblib.load('C:/Repo/MiM_Analytics_Tesis/Tesis/dash_app/data/dropdown_options.pkl')
 
+countries_latam = ['Argentina', 'Brazil', 'Chile', 'Colombia', 'Mexico', 'Peru']
 for country in list(dropdown_options.keys()):
-    if country not in ['Argentina', 'Brazil', 'Chile', 'Colombia', 'Mexico', 'Peru']:
+    if country not in countries_latam:
         del dropdown_options[country]
 
 cols_table = ['player_name', 'Perf_Index_scaled', 'player_preferred_position', 'team_name', 'team_country',
@@ -80,6 +81,7 @@ navbar = dbc.Navbar(id='navbar', children=[
         dbc.Button(id='button', children="Log in", color="primary", className='ml-auto')
 ], dark=True, color='dark')
 
+
 app.layout = dbc.Container([
         dbc.Row([dbc.Col([html.Div(id='parent', children=[navbar])], xl=12, lg=12, md=12, sm=12, xs=12)]),
         html.Br(),
@@ -92,6 +94,9 @@ app.layout = dbc.Container([
                  html.Br(),
                  html.H6(id='measure_posicion', children='Posicion'),
                  dcc.Dropdown(id='dropdown_posicion', placeholder='Todas las posiciones', options=[{'label': i, 'value': i} for i in sorted(df_players['player_preferred_position'].unique())]),
+                 html.Br(),
+                 html.H6(id='measure_appearances', children='Apariciones'),
+                 dcc.RangeSlider(id='slider_appearances', min=0, max=60, value=[0, 60], tooltip={"placement": "bottom", "always_visible": True}),
                  html.Br(),
                  html.H6(id='measure_minutes', children='Minutos jugados'),
                  dcc.RangeSlider(id='slider_minutes', min=270, max=4500, value=[270, 4500], tooltip={"placement": "bottom", "always_visible": True}),
@@ -118,27 +123,29 @@ app.layout = dbc.Container([
                  html.H6(id='measure_shots_p90', children='Shots P90'),
                  dcc.RangeSlider(id='slider_shots_p90', min=0, max=100, value=[0, 100], tooltip={"placement": "bottom", "always_visible": True})],
                 xl=3, lg=3, md=3, sm=12, xs=12),
+                dbc.Col([], xl=1, lg=1, md=1, sm=12, xs=12),
                 dbc.Col([html.Div(id='table_season', children=table(df_players))],
                         xl=8, lg=8, md=8, sm=12, xs=12)]),
 ], fluid=True)
-
 @app.callback(Output('table_season', 'children'),
               [Input('dropdown_liga', 'value'),
                Input('dropdown_season', 'value'),
                Input('dropdown_posicion', 'value'),
+               Input('slider_appearances', 'value'),
                Input('slider_minutes', 'value'),
                Input('slider_goals', 'value'),
                Input('slider_assits', 'value'),
                Input('slider_yellow', 'value'),
                Input('slider_red', 'value'),
                Input('slider_perf_index', 'value')])
-def update_output(value_liga, value_season, value_posicion, value_minutes, value_goals, value_assists,
+def update_output(value_liga, value_season, value_posicion, value_appearances, value_minutes, value_goals, value_assists,
                   value_yellow, value_red, value_perf_index):
 
     if value_season != None:
-        df_table = df_season_players[df_season_players['season'] == value_season].copy()
+        df_table = df_season_players[(df_season_players['team_country'].isin(countries_latam)) &
+                                     (df_season_players['season'] == value_season)].copy()
     else:
-        df_table = df_players.copy()
+        df_table = df_players[df_players['team_country'].isin(countries_latam)].copy()
 
     if value_liga != None:
         df_table = df_table[df_table['team_country'] == value_liga]
@@ -146,6 +153,7 @@ def update_output(value_liga, value_season, value_posicion, value_minutes, value
     if value_posicion != None:
         df_table = df_table[df_table['player_preferred_position'] == value_posicion]
 
+    df_table = df_table[(df_table['appearances'] >= value_appearances[0]) & (df_table['appearances'] <= value_appearances[1])]
     df_table = df_table[(df_table['player_minutes'] >= value_minutes[0]) & (df_table['player_minutes'] <= value_minutes[1])]
     df_table = df_table[(df_table['goals_total'] >= value_goals[0]) & (df_table['goals_total'] <= value_goals[1])]
     df_table = df_table[(df_table['goals_assists'] >= value_assists[0]) & (df_table['goals_assists'] <= value_assists[1])]
