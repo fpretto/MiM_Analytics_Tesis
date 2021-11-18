@@ -83,6 +83,8 @@ WHERE row_n=1);
 DROP TABLE IF EXISTS fdm.dash_ft_abt_season_player;
 CREATE TABLE fdm.dash_ft_abt_season_player AS (
 SELECT
+	teams.team_country_code,
+	teams.team_country,
 	matches.league_season,
 	player_team.team_id,
 	teams.team_name,
@@ -90,6 +92,7 @@ SELECT
 	player_names.player_name,
 	player_positions.player_position AS player_preferred_position,
 	player_numbers.player_number AS player_preferred_number,
+	COUNT(DISTINCT stats_players.fixture_id) AS appearances,
 	SUM(stats_players.player_minutes) AS player_minutes,
 	SUM(player_rating*stats_players.player_minutes)/NULLIF(SUM(CASE WHEN player_rating<1 THEN 0 ELSE stats_players.player_minutes END), 0) wavg_player_rating,
 	SUM(stats_players.offsides) AS offsides,
@@ -145,10 +148,12 @@ LEFT JOIN fdm.ft_api_matches_stats_teams AS stats_teams
 	ON stats_players.fixture_id=stats_teams.fixture_id AND stats_players.team_id=stats_teams.teams_id
 INNER JOIN fdm.dash_lk_leagues AS dash_leagues
 	ON matches.league_id=dash_leagues.league_id AND matches.league_season=dash_leagues.league_season
-GROUP BY matches.league_season, player_team.team_id, teams.team_name,stats_players.player_id, player_names.player_name, 
+GROUP BY teams.team_country_code, teams.team_country, matches.league_season, player_team.team_id, 
+	teams.team_name,stats_players.player_id, player_names.player_name, 
 	player_positions.player_position, player_numbers.player_number
 );
 
+DROP TABLE fdm.dash_lk_player_team;
 DROP TABLE fdm.dash_lk_player_position;
 DROP TABLE fdm.dash_lk_player_number;
 
