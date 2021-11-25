@@ -31,23 +31,24 @@ importlib.reload(PI_FactorAnalysis)
 dict_cols = {"player_cols": ['player_id', 'player_name', 'player_preferred_position', 'player_preferred_number', 'player_minutes'],
 
              "F": ['np_goals_p90', 'shots_p90', 'shooting_accuracy', 'goal_conversion_np', 'passing_accuracy',
-                         'assists_p90', 'key_passes_p90', 'dribbles_p90', 'dribbles_success_ratio', 'total_tackles_p90'],
+                   'assists_p90', 'key_passes_p90', 'dribbles_p90', 'dribbles_success_ratio', 'total_tackles_p90',
+                   'avg_team_position', 'avg_league_cov'],
 
              "M": ['wavg_player_rating', 'passes_p90', 'passing_accuracy', 'key_passes_p90', 'scoring_contribution',
-                         'dribbles_success_ratio', 'fouls_drawn_p90', 'fouls_committed_p90', 'dribbles_past_p90',
-                         'total_tackles_p90', 'tackles_p90', 'interceptions_p90'],
+                   'dribbles_success_ratio', 'fouls_drawn_p90', 'fouls_committed_p90', 'dribbles_past_p90',
+                   'total_tackles_p90', 'tackles_p90', 'interceptions_p90', 'avg_team_position', 'avg_league_cov'],
 
              "D": ['wavg_player_rating', 'passes_p90', 'passing_accuracy', 'key_passes_p90', 'fouls_drawn_p90',
-                         'fouls_committed_p90', 'dribbles_past_p90', 'duels_p90', 'duels_success_ratio', 'tackles_p90',
-                         'blocks_p90', 'interceptions_p90'],
+                   'fouls_committed_p90', 'dribbles_past_p90', 'duels_p90', 'duels_success_ratio', 'tackles_p90',
+                   'blocks_p90', 'interceptions_p90', 'avg_team_position', 'avg_league_cov'],
 
              "G": ['wavg_player_rating', 'saves_p90', 'goals_conceded_p90', 'passes_p90', 'passing_accuracy',
-                         'fouls_drawn_p90', 'fouls_committed_p90', 'duels_p90', 'duels_success_ratio', 'tackles_p90',
-                         'interceptions_p90', 'penalty_committed_p90']
+                   'fouls_drawn_p90', 'fouls_committed_p90', 'duels_p90', 'duels_success_ratio', 'tackles_p90',
+                   'interceptions_p90', 'penalty_committed_p90', 'avg_team_position', 'avg_league_cov']
              }
 
 ## Load files
-f = open(PATH_REPO+"ConfigFile.json", "r")
+f = open(PATH_REPO+"perfindex_config.json", "r")
 inputs = json.loads(f.read())
 
 AR = pd.read_csv(inputs['data_sources']['master_path']+inputs['data_sources']['AR'], encoding='utf-8', decimal='.', sep='|')
@@ -74,4 +75,4 @@ df_gk, dict_weights = PI_FactorAnalysis.create_index(df_gk, dict_cols['G'], dict
 
 ## Export
 dict_perf_index = {'cols': dict_cols, 'scalers': dict_scalers, 'index_weights': dict_weights}
-joblib.dump(dict_perf_index, PATH_REPO+'PerformanceIndexObject.pkl')
+joblib.dump(dict_perf_index, PATH_REPO+'20211118_PerformanceIndexObject.pkl')

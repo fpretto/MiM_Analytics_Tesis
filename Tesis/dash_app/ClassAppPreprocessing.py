@@ -52,7 +52,7 @@ class ClassPreprocessing:
         :return:
             df_scored: input dataframe with ana aditional column (Performance Index)
         """
-        dict_perf_index = joblib.load(PATH_PI+'PerformanceIndexObject.pkl')
+        dict_perf_index = joblib.load(PATH_PI+'20211118_PerformanceIndexObject.pkl')
 
         df_scored = PI_Preprocessing.filter_and_data_engineering(AR, rating_correction=None, correct_rating=False)
         df_scored = PI_FactorAnalysis.score_index(df_scored, dict_perf_index)

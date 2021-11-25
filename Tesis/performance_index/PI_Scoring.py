@@ -30,7 +30,7 @@ importlib.reload(PI_Preprocessing)
 importlib.reload(PI_FactorAnalysis)
 
 # Load files
-f = open(PATH_REPO+"ConfigFile.json", "r")
+f = open(PATH_REPO+"perfindex_config.json", "r")
 inputs = json.loads(f.read())
 
 uri = 'postgresql+psycopg2://{}:{}@{}:{}/{}'.format(
@@ -42,7 +42,7 @@ conn = engine.raw_connection()
 cursor = conn.cursor()
 
 AR_score = pd.read_sql_query("SELECT * FROM fdm.dash_ft_abt_season_player;", conn)
-dict_perf_index = joblib.load(PATH_REPO+'PerformanceIndexObject.pkl')
+dict_perf_index = joblib.load(PATH_REPO+'20211118_PerformanceIndexObject.pkl')
 
 # Preprocessing
 df = PI_Preprocessing.filter_and_data_engineering(AR_score, rating_correction=None, correct_rating=False)
@@ -50,4 +50,4 @@ df = PI_Preprocessing.filter_and_data_engineering(AR_score, rating_correction=No
 # Scoring
 df_indexes = PI_FactorAnalysis.score_index(df, dict_perf_index)
 
-df_indexes.to_csv('C:/Repo/MiM_Analytics_Tesis/Tesis/DASH_PlayersScored_20211114.csv', sep='|', decimal='.')
+df_indexes.to_csv('C:/Repo/MiM_Analytics_Tesis/Tesis/DASH_PlayersScored_20211118.csv', sep='|', decimal='.')

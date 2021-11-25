@@ -93,6 +93,7 @@ def filter_and_data_engineering(df_ar, rating_correction, correct_rating=False):
     df['dribbles_past_p90'] = df['dribbles_past_p90']*-1
     df['penalty_committed_p90'] = df['penalty_committed_p90']*-1
     df['goals_conceded_p90'] = df['goals_conceded_p90']*-1
+    df['avg_league_cov'] = df['avg_league_cov']*-1
 
     return df
 

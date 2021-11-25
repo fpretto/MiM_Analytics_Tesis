@@ -99,7 +99,7 @@ app.layout = dbc.Container([
                  html.Br(),
                  html.H4(id='title_performance', children='Performance'),
                  html.H6(id='measure_index', children='Performance index'),
-                 dcc.RangeSlider(id='slider_perf_index', min=0, max=100, value=[0, 100], tooltip={"placement": "bottom", "always_visible": True}),
+                 dcc.RangeSlider(id='slider_perf_index', min=0, max=120, value=[0, 100], tooltip={"placement": "bottom", "always_visible": True}),
                  html.Br(),
                  html.Br(),
                  html.H4(id='title_general', children='General'),
