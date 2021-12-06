@@ -74,11 +74,6 @@
 			"username": "postgres",
 			"password": "trivisono",
 			"database": "SportsAnalytics"
-		},
-		"mongoDB": {
-			"username": "username",
-			"password": "encrypted_password",
-			"host": "host name"
 		}
 	}
 }
