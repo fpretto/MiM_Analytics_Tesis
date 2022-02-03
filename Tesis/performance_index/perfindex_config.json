@@ -1,8 +1,8 @@
 {
   "data_sources": {
     "master_path":  "C:/Repo/MiM_Analytics_Tesis/Tesis/",
-    "AR": "AR_season_20211118.csv",
-    "rating_correction": "rating_correction.csv",
+    "AR": "AR_20220203.csv",
+    "rating_correction": "AR_rating_correction_20220203.csv",
     "AR_score":  "AR_All_20211026.csv"},
   "PostgreSQL": {
     "host": "localhost",

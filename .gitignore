@@ -113,3 +113,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+Tesis/AR_season_20220131.csv
+*.csv

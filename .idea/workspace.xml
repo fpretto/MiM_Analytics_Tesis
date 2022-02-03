@@ -92,7 +92,7 @@
       <recent name="C:\Repo\MiM_Analytics_Tesis\Tesis\dash_app" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.AppScouting">
+  <component name="RunManager" selected="Python.AppJugador (1)">
     <configuration name="AppJugador (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="MiM_Analytics_Tesis" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -200,9 +200,9 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.AppJugador (1)" />
         <item itemvalue="Python.AppScouting" />
         <item itemvalue="Python.ETL_Engine" />
-        <item itemvalue="Python.AppJugador (1)" />
         <item itemvalue="Python.AppJugador" />
         <item itemvalue="Python.scratch_6" />
       </list>

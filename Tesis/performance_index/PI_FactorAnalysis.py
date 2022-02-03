@@ -138,3 +138,65 @@ def score_index(df, dict_perf_index):
                                                   df_index['Perf_Index_scaled']], axis=1)).reset_index(drop=True)
 
     return df_indexes
+
+def sensitivity_analysis(df, dict_perf_index, path):
+
+    dict_sensitivity_plots = {}
+
+    for position in ['F', 'M', 'D', 'G']:
+
+        df_index = df[df['player_preferred_position'] == position].reset_index(drop=True)
+
+        # Extract steps values
+        min_list = []
+        half_step_min = []
+        mean_list = []
+        half_step_max = []
+        max_list = []
+
+        for col in dict_perf_index['cols'][position]:
+            min_list.append(df_index[col].min())
+            half_step_min.append((df_index[col].mean()+df_index[col].min())/2)
+            mean_list.append(df_index[col].mean())
+            half_step_max.append((df_index[col].max()+df_index[col].mean())/2)
+            max_list.append(df_index[col].max())
+
+        df_sensitivity = pd.DataFrame([min_list, half_step_min, mean_list, half_step_max, max_list],
+                                      index=['Min', 'Half_Min', 'Mean', 'Half_Max', 'Max'],
+                                      columns=dict_perf_index['cols'][position])
+
+        # Calculate index variations
+        dict_all = {}
+        dict_step = {}
+
+        for col in df_sensitivity.columns:
+            for step in ['Min', 'Half_Min', 'Mean', 'Half_Max', 'Max']:
+                list_vars = list(dict_perf_index['cols'][position])
+                list_vars.remove(col)
+                df_iter = pd.DataFrame(pd.concat([pd.Series(df_sensitivity.loc[step, col], name=col),
+                                                  df_sensitivity.loc['Mean', list_vars]])).transpose()
+                df_iter.columns = df_sensitivity.columns
+                df_iter['Perf_Index'] = np.sum(df_iter[dict_perf_index['cols'][position]]**dict_perf_index['index_weights'][position]['Weights'], axis=1)
+                df_iter['Perf_Index_scaled'] = dict_perf_index['index_weights']['index_scaler'].transform(pd.DataFrame(df_iter['Perf_Index']))
+                dict_step[step] = df_iter.loc[0, 'Perf_Index_scaled']
+                dict_all[col] = dict(dict_step)
+
+        df_scored_steps = pd.DataFrame.from_dict(dict_all)
+
+        # Calculate percentual variation
+        for col in df_scored_steps.columns:
+            df_scored_steps[col] = (df_scored_steps[col]/df_scored_steps.loc['Mean', col]-1)*100
+
+        # Plot variations
+        df_plot = df_scored_steps.transpose()
+        df_plot['Min'] = df_plot['Min']-df_plot['Half_Min']
+        df_plot['Max'] = df_plot['Max']-df_plot['Half_Max']
+        plot_cols = ['Half_Min', 'Min', 'Half_Max', 'Max']
+
+        fig, ax = plt.subplots(figsize=(8, 8))
+        df_plot[plot_cols].plot(kind='barh', stacked=True, ax=ax, color=['lightcoral', 'indianred', 'mediumseagreen', 'forestgreen'])
+        ax.set_xlabel('Variation in Performance Index (%)')
+        ax.legend(['-1/2 Step', '-1 Step', '+1/2 Step', '+1 Step'])
+        ax.xaxis.grid(linestyle='--')
+        fig.savefig(path+'SensitivityAnalysis_' + position + '.png', bbox_inches='tight', pad_inches=1)
+

@@ -28,23 +28,24 @@ import importlib
 importlib.reload(PI_Preprocessing)
 importlib.reload(PI_FactorAnalysis)
 
-dict_cols = {"player_cols": ['player_id', 'player_name', 'player_preferred_position', 'player_preferred_number', 'player_minutes'],
+dict_cols = {"player_cols": ['league_season', 'team_id', 'team_name', 'player_id', 'player_name',
+                             'player_preferred_position', 'player_minutes', 'wavg_player_rating'],
 
              "F": ['np_goals_p90', 'shots_p90', 'shooting_accuracy', 'goal_conversion_np', 'passing_accuracy',
-                   'assists_p90', 'key_passes_p90', 'dribbles_p90', 'dribbles_success_ratio', 'total_tackles_p90',
-                   'avg_team_position', 'avg_league_cov'],
+                   'assists_p90', 'key_passes_p90', 'dribbles_p90', 'dribbles_success_ratio', 'tackles_p90',
+                   'interceptions_p90'],
 
-             "M": ['wavg_player_rating', 'passes_p90', 'passing_accuracy', 'key_passes_p90', 'scoring_contribution',
+             "M": ['passes_p90', 'passing_accuracy', 'key_passes_p90', 'scoring_contribution', 'dribbles_p90',
                    'dribbles_success_ratio', 'fouls_drawn_p90', 'fouls_committed_p90', 'dribbles_past_p90',
-                   'total_tackles_p90', 'tackles_p90', 'interceptions_p90', 'avg_team_position', 'avg_league_cov'],
+                   'tackles_p90', 'interceptions_p90'],
 
-             "D": ['wavg_player_rating', 'passes_p90', 'passing_accuracy', 'key_passes_p90', 'fouls_drawn_p90',
-                   'fouls_committed_p90', 'dribbles_past_p90', 'duels_p90', 'duels_success_ratio', 'tackles_p90',
-                   'blocks_p90', 'interceptions_p90', 'avg_team_position', 'avg_league_cov'],
+             "D": ['passes_p90', 'passing_accuracy', 'fouls_drawn_p90', 'fouls_committed_p90', 'dribbles_past_p90',
+                   'duels_p90', 'duels_success_ratio', 'tackles_p90', 'blocks_p90', 'interceptions_p90',
+                   'penalty_committed_p90'],
 
-             "G": ['wavg_player_rating', 'saves_p90', 'goals_conceded_p90', 'passes_p90', 'passing_accuracy',
+             "G": ['saves_p90', 'goals_conceded_p90', 'goals_conceded_ratio', 'passes_p90', 'passing_accuracy',
                    'fouls_drawn_p90', 'fouls_committed_p90', 'duels_p90', 'duels_success_ratio', 'tackles_p90',
-                   'interceptions_p90', 'penalty_committed_p90', 'avg_team_position', 'avg_league_cov']
+                   'blocks_p90', 'interceptions_p90', 'penalty_committed_p90']
              }
 
 ## Load files
@@ -61,18 +62,19 @@ df_gk, df_df, df_mf, df_fw, dict_scalers = PI_Preprocessing.normalize_by_positio
 ## Create Index
 dict_weights = {}
 # Forwards
-df_fw, dict_weights = PI_FactorAnalysis.create_index(df_fw, dict_cols['F'], dict_weights, position='F', factors=4,
+df_fw, dict_weights = PI_FactorAnalysis.create_index(df_fw, dict_cols['F'], dict_weights, position='F', factors=5,
                                                      factors_method='principal', factors_rotation='varimax')
 # Midfielders
-df_mf, dict_weights = PI_FactorAnalysis.create_index(df_mf, dict_cols['M'], dict_weights, position='M', factors=4,
+df_mf, dict_weights = PI_FactorAnalysis.create_index(df_mf, dict_cols['M'], dict_weights, position='M', factors=5,
                                                      factors_method='principal', factors_rotation='varimax')
 # Defenders
-df_df, dict_weights = PI_FactorAnalysis.create_index(df_df, dict_cols['D'], dict_weights, position='D', factors=4,
+df_df, dict_weights = PI_FactorAnalysis.create_index(df_df, dict_cols['D'], dict_weights, position='D', factors=5,
                                                      factors_method='principal', factors_rotation='varimax')
 # Goalkeepers
 df_gk, dict_weights = PI_FactorAnalysis.create_index(df_gk, dict_cols['G'], dict_weights, position='G', factors=5,
                                                      factors_method='principal', factors_rotation='varimax')
 
-## Export
 dict_perf_index = {'cols': dict_cols, 'scalers': dict_scalers, 'index_weights': dict_weights}
+
+## Export
 joblib.dump(dict_perf_index, PATH_REPO+'20211118_PerformanceIndexObject.pkl')
