@@ -1,10 +1,11 @@
 {
-      "Parameters": {"current_season":  2021},
+      "Parameters": {"current_season":  "2021/22"},
       "DataSources": {
-            "master_path":  "C:/Repo/MiM_Analytics_Tesis/Tesis/",
-            "AR": "AR_20211019.csv",
-            "rating_correction": "rating_correction.csv",
-            "AR_score":  "AR_All_20211026.csv"},
+            "master_path":  "C:/Repo/MiM_Analytics_Tesis/Tesis/datasets/",
+            "AR_players": "AR_players_20220210.csv",
+            "AR_seasons": "AR_players_season_20220210.csv",
+            "rating_correction": "AR_rating_correction_20220210.csv",
+            "PerfIndexObject":  "20220210_PerformanceIndexObject.pkl"},
       "PostgreSQL": {
             "host": "localhost",
             "port": "5432",
@@ -42,7 +43,7 @@
             "wavg_player_rating": "Rating promedio",
             "goals_total": "Total Goles",
             "goals_assists": "Total Asistencias",
-            "scoring_contribution": "Participacion directa en goles",
+            "scoring_contribution": "Participacion en goles",
             "goals_p90": "Goles P90",
             "goal_conversion": "Efectividad de conversion",
             "shots_p90": "Tiros P90",

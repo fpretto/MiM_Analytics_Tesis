@@ -6,19 +6,24 @@ import sys
 from sqlalchemy import create_engine
 PATH_PI = 'C:/Repo/MiM_Analytics_Tesis/Tesis/performance_index/'
 sys.path.insert(0, PATH_PI)
-import PI_Preprocessing
-import PI_FactorAnalysis
+from PI_Preprocessing import PI_Preprocessing
+from PI_FactorAnalysis import PI_FactorAnalysis
 import importlib
 
-importlib.reload(PI_Preprocessing)
-importlib.reload(PI_FactorAnalysis)
+#importlib.reload(PI_Preprocessing)
+#importlib.reload(PI_FactorAnalysis)
 
 class ClassPreprocessing:
 
     def __init__(self, config_data):
         self.config_data = config_data
+        self.master_path = config_data['DataSources']['master_path']
+        self.AR_players = config_data['DataSources']['AR_players']
+        self.AR_seasons = config_data['DataSources']['AR_seasons']
+        self.AR_rating_correction = config_data['DataSources']['rating_correction']
+        self.PerfIndexObj = config_data['DataSources']['PerfIndexObject']
 
-    def load_AR(self, dataset):
+    def load_AR(self, dataset, source):
         """
         Queries data from PostgreSQL and creates dataframes
         :param config_data: JSON file with connection parameters
@@ -36,12 +41,16 @@ class ClassPreprocessing:
         engine = create_engine(uri)
         conn = engine.raw_connection()
 
-        if dataset == 'player_seasons':
-            AR = pd.read_sql_query("SELECT * FROM fdm.dash_ft_abt_season_player;", conn)
-        elif dataset == 'player_all_seasons':
-            AR = pd.read_sql_query("SELECT * FROM fdm.dash_ft_abt_players;", conn)
+        if source == 'pg':
+            if dataset == 'player_seasons':
+                AR = pd.read_sql_query("SELECT * FROM fdm.dash_ft_abt_season_players_train;", conn)
+            elif dataset == 'player_all_seasons':
+                AR = pd.read_sql_query("SELECT * FROM fdm.dash_ft_abt_players_train;", conn)
         else:
-            AR = None
+            if dataset == 'player_seasons':
+                AR = pd.read_csv(self.master_path+self.AR_seasons, encoding='utf-8', decimal='.', sep='|')
+            elif dataset == 'player_all_seasons':
+                AR = pd.read_csv(self.master_path+self.AR_players, encoding='utf-8', decimal='.', sep='|')
 
         return AR
 
@@ -52,10 +61,10 @@ class ClassPreprocessing:
         :return:
             df_scored: input dataframe with ana aditional column (Performance Index)
         """
-        dict_perf_index = joblib.load(PATH_PI+'20211118_PerformanceIndexObject.pkl')
+        dict_perf_index = joblib.load(PATH_PI+self.PerfIndexObj)
 
-        df_scored = PI_Preprocessing.filter_and_data_engineering(AR, rating_correction=None, correct_rating=False)
-        df_scored = PI_FactorAnalysis.score_index(df_scored, dict_perf_index)
+        df_scored = PI_Preprocessing().filter_and_data_engineering(AR, rating_correction=None, correct_rating=False)
+        df_scored = PI_FactorAnalysis().score_index(df_scored, dict_perf_index)
 
         return df_scored
 
@@ -68,6 +77,8 @@ class ClassPreprocessing:
             df: processed dataframe
         """
         df['Perf_Index_scaled'] = df['Perf_Index_scaled'].apply(lambda x: round(x*100))
+        df['Perf_Index_scaled'] = np.where(df['Perf_Index_scaled'] > 100, 100, df['Perf_Index_scaled'])
+        df['Perf_Index_scaled'] = np.where(df['player_preferred_position'] == 'D', df['Perf_Index_scaled']-15, df['Perf_Index_scaled'])
         df['wavg_player_rating'] = df['wavg_player_rating'].apply(lambda x: round(x, 2))
         df['player_preferred_position'] = df['player_preferred_position'].map(self.config_data['ColumnValues']["player_preferred_position"])
 
@@ -76,7 +87,7 @@ class ClassPreprocessing:
 
         return df[(~df['player_name'].isna()) & (~df['team_name'].isna())]
 
-    def load_score_process_data(self, dataset, generate_dropdown=False):
+    def load_score_process_data(self, dataset, source, generate_dropdown=False):
         """
         Loads data from PostgreSQL, calculates Performance Index and format data
         :param
@@ -86,7 +97,7 @@ class ClassPreprocessing:
             df: dataframe ready for Dash
         """
 
-        AR = self.load_AR(dataset=dataset)
+        AR = self.load_AR(dataset=dataset, source=source)
         df = self.score_performance_index(AR)
         df = self.feature_engineering(df, dataset=dataset)
 
@@ -102,7 +113,7 @@ class ClassPreprocessing:
                                                                       (df['league_season'] == season) &
                                                                       (df['team_name'] == team)]['player_name'].unique()
 
-            joblib.dump(dict_options, 'C:/Repo/MiM_Analytics_Tesis/Tesis/dash_app/data/dropdown_options.pkl')
+            joblib.dump(dict_options, self.master_path+'dropdown_options.pkl')
 
         return df
 
