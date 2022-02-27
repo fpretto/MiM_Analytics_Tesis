@@ -83,16 +83,16 @@
   </component>
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File" value="Python&#10;JSON" />
+    <property name="com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File" value="GitIgnore&#10;Python&#10;JSON" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="preferences.keymap" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Repo\MiM_Analytics_Tesis\Tesis\dash_app" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.AppJugador (1)">
+  <component name="RunManager" selected="Python.AppScouting">
     <configuration name="AppJugador (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="MiM_Analytics_Tesis" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -200,8 +200,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.AppJugador (1)" />
         <item itemvalue="Python.AppScouting" />
+        <item itemvalue="Python.AppJugador (1)" />
         <item itemvalue="Python.ETL_Engine" />
         <item itemvalue="Python.AppJugador" />
         <item itemvalue="Python.scratch_6" />
