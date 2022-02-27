@@ -1,13 +1,12 @@
 import dash
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import dcc
+from dash import html
+from dash import dash_table
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
 import plotly.graph_objects as go
-import plotly.express as px
 import pandas as pd
-import numpy as np
-import dash_table
+
 import json
 import joblib
 import sys
@@ -16,13 +15,15 @@ sys.path.insert(0, PATH_PI)
 from ClassAppPreprocessing import ClassPreprocessing
 
 app = dash.Dash(external_stylesheets=[dbc.themes.YETI])
+app.title = 'Football Analytics App'
+server = app.server
 
 # Load data
 config_data = json.load(open(PATH_PI+'config_dash.json'))
 preprocessing = ClassPreprocessing(config_data)
 df_season_players = preprocessing.load_score_process_data(dataset='player_seasons', source='csv', generate_dropdown=False)
 df_players = preprocessing.load_score_process_data(dataset='player_all_seasons', source='csv')
-dropdown_options = joblib.load(PATH_PI+'data/dropdown_options.pkl')
+dropdown_options = joblib.load(config_data['DataSources']['master_path']+'dropdown_options.pkl')
 countries_latam = ['Argentina', 'Brazil', 'Chile', 'Colombia', 'Mexico', 'Peru']
 dropdown_options = {country: dropdown_options[country] for country in countries_latam}
 
@@ -97,6 +98,7 @@ def bar_chart(df, var, layout):
     :return:
         figure object to display in the Dash app
     """
+    df = df.sort_values('league_season')
     fig = go.Figure([go.Bar(x=df['season'], y=df[var],
                             text=df[var], textposition='auto',
                             marker_color='darkblue', name='PI')])

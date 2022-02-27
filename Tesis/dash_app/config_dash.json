@@ -1,5 +1,5 @@
 {
-      "Parameters": {"current_season":  "2021/22"},
+      "Parameters": {"current_season":  "2020/21"},
       "DataSources": {
             "master_path":  "C:/Repo/MiM_Analytics_Tesis/Tesis/datasets/",
             "AR_players": "AR_players_20220210.csv",

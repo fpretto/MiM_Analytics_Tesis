@@ -1,21 +1,19 @@
 import dash
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import dcc
+from dash import html
+from dash import dash_table
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
-import plotly.graph_objects as go
-import plotly.express as px
-import pandas as pd
-import numpy as np
-import dash_table
 import json
 import joblib
 import sys
+
 PATH_PI = 'C:/Repo/MiM_Analytics_Tesis/Tesis/dash_app/'
 sys.path.insert(0, PATH_PI)
 from ClassAppPreprocessing import ClassPreprocessing
 
 app = dash.Dash(external_stylesheets=[dbc.themes.YETI])
+app.title = 'Football Analytics App'
 
 # Load data
 config_data = json.load(open(PATH_PI+'config_dash.json'))

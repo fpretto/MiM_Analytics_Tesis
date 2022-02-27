@@ -84,6 +84,7 @@ class ClassPreprocessing:
 
         if dataset == 'player_seasons':
             df['season'] = df['league_season'].astype(str) + '/' + df['league_season'].apply(lambda x: str(x+1)[2:4])
+            df = df[df['season'] != '2021/22'].copy()
 
         return df[(~df['player_name'].isna()) & (~df['team_name'].isna())]
 
@@ -106,11 +107,11 @@ class ClassPreprocessing:
 
             for country in df['team_country'].unique():
                 dict_options[country] = {}
-                for season in df[(df['team_country'] == country)]['league_season'].unique():
+                for season in df[(df['team_country'] == country)]['season'].unique():
                     dict_options[country][str(season)] = {}
-                    for team in df[(df['team_country'] == country) & (df['league_season'] == season)]['team_name']:
+                    for team in df[(df['team_country'] == country) & (df['season'] == season)]['team_name']:
                         dict_options[country][str(season)][team] = df[(df['team_country'] == country) &
-                                                                      (df['league_season'] == season) &
+                                                                      (df['season'] == season) &
                                                                       (df['team_name'] == team)]['player_name'].unique()
 
             joblib.dump(dict_options, self.master_path+'dropdown_options.pkl')
