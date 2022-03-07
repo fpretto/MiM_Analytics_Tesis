@@ -81,9 +81,3 @@ dict_perf_index = {'cols': dict_cols, 'scalers': dict_scalers, 'index_weights': 
 
 ## Export
 joblib.dump(dict_perf_index, PATH_REPO+'20220210_PerformanceIndexObject.pkl')
-
-df_df.columns
-df_df['Perf_Index_scaled'].describe()
-df_fw['Perf_Index_scaled'].describe()
-df_mf['Perf_Index_scaled'].describe()
-df_gk['Perf_Index_scaled'].describe()

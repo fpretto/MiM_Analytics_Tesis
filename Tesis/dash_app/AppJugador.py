@@ -51,7 +51,7 @@ def create_player_table(df, phase, season):
     return df_filtered[['Feature', 'Value']]
 
 # Tables
-initial_player = 'Julian Alvarez'
+initial_player = 'Nicolas Castillo'
 initial_team = 'River Plate'
 df_initial_player = df_season_players[df_season_players['player_name'] == initial_player]
 h2_player_title = f'{initial_player}'
@@ -127,6 +127,7 @@ def line_chart(df, var, dict_vars, layout):
         figure object to display in the Dash app
     """
     df[var] = round(df[var], 2)
+    df = df.sort_values('league_season')
 
     fig = go.Figure(data=[go.Scatter(x=df['season'], y=df[var],
                                      line=dict(color='firebrick', width=3), fill='tozeroy',
