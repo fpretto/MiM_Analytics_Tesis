@@ -176,5 +176,3 @@ DROP TABLE fdm.dash_lk_player_team;
 DROP TABLE fdm.dash_lk_player_number_all_seasons;
 DROP TABLE fdm.dash_lk_player_position_all_seasons;
 DROP TABLE fdm.dash_lk_team_opp_stats;
-
-SELECT * FROM fdm.dash_ft_abt_players_train LIMIT 100
