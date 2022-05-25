@@ -51,8 +51,8 @@ def create_player_table(df, phase, season):
     return df_filtered[['Feature', 'Value']]
 
 # Tables
-initial_player = 'Nicolas Castillo'
-initial_team = 'River Plate'
+initial_player = 'Renzo Saravia'
+initial_team = 'Racing Club'
 df_initial_player = df_season_players[df_season_players['player_name'] == initial_player]
 h2_player_title = f'{initial_player}'
 df_season = create_player_table(df_initial_player, phase='stats_season', season=config_data['Parameters']['current_season'])
@@ -249,8 +249,8 @@ app.layout = dbc.Container([
                 style={'textAlign': 'left', 'marginTop': 30, 'marginBottom': 5}),
 
         # Season
-        dbc.Row([dbc.Col([dcc.Graph(id='radar_chart', figure=radar_chart(df_season_players, initial_player, initial_team, config_data['Parameters']['current_season']))],
-                         xl=12, lg=12, md=12, sm=12, xs=12)]),
+        #dbc.Row([dbc.Col([dcc.Graph(id='radar_chart', figure=radar_chart(df_season_players, initial_player, initial_team, config_data['Parameters']['current_season']))],
+        #                 xl=12, lg=12, md=12, sm=12, xs=12)]),
 
         dbc.Row([dbc.Col([html.Div(id='table_season', children=table(df_season))], xl=3, lg=3, md=3, sm=12, xs=12),
                  dbc.Col([dcc.Graph(id='bar_plot_index', figure=bar_chart(df_initial_player, 'Perf_Index_scaled', dict_layout))],
@@ -343,7 +343,7 @@ def set_players_value(player_options):
                Output(component_id='table_attack', component_property='children'),
                Output(component_id='table_buildup', component_property='children'),
                Output(component_id='table_defense', component_property='children'),
-               Output(component_id='radar_chart', component_property='figure'),
+               #Output(component_id='radar_chart', component_property='figure'),
                Output(component_id='bar_plot_index', component_property='figure'),
                Output(component_id='line_plot_goals', component_property='figure'),
                Output(component_id='line_plot_assists', component_property='figure'),
@@ -378,7 +378,7 @@ def update_player_data(season_dropdown_value, team_dropdown_value, player_dropdo
     table_buildup = table(df_buildup)
     table_defense = table(df_defense)
     # Plots
-    fig_radar = radar_chart(df_season_players, player_dropdown_value, team_dropdown_value, season_dropdown_value)
+    #fig_radar = radar_chart(df_season_players, player_dropdown_value, team_dropdown_value, season_dropdown_value)
     fig_index = bar_chart(df_player, 'Perf_Index_scaled', dict_layout)
     fig_goals = line_chart(df_player, 'goals_p90', config_data, dict_layout)
     fig_assists = line_chart(df_player, 'assists_p90', config_data, dict_layout)
@@ -395,7 +395,7 @@ def update_player_data(season_dropdown_value, team_dropdown_value, player_dropdo
 
     h2_player_title = f'{player_dropdown_value}'
 
-    return h2_player_title, table_season, table_attack, table_buildup, table_defense, fig_radar, \
+    return h2_player_title, table_season, table_attack, table_buildup, table_defense, \
            fig_index, fig_goals, fig_assists, fig_shots, fig_shooting_acc, fig_passes, fig_passing_acc, fig_dribbles, \
            fig_duels, fig_saves, fig_tackles, fig_interceptions, fig_blocks
 

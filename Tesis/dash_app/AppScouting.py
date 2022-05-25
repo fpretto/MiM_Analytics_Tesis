@@ -116,7 +116,7 @@ app.layout = dbc.Container([
                  html.H6(id='measure_yellow', children='Tarjetas amarillas'),
                  dcc.RangeSlider(id='slider_yellow', min=0, max=30, value=[0, 30], tooltip={"placement": "bottom", "always_visible": True}),
                  html.Br(),
-                 # Barra Tarjetas rojas0
+                 # Barra Tarjetas rojas
                  html.H6(id='measure_red', children='Tarjetas rojas'),
                  dcc.RangeSlider(id='slider_red', min=0, max=10, value=[0, 10], tooltip={"placement": "bottom", "always_visible": True})],
                 xl=2, lg=2, md=2, sm=12, xs=12),
